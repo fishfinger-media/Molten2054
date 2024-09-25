@@ -13,6 +13,6 @@
     "vite-plugin-glsl": "^0.1.1"
   },
   "dependencies": {
-    "gsap": "npm:@gsap/shockingly@^3.12.5"
+    "gsap": "^3.12.5"
   }
 }
