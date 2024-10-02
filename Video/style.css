@@ -1,0 +1,18 @@
+body {
+    margin:0;
+
+    background:black;
+    min-height: 100vh;
+}
+
+video {
+    
+}
+
+.video-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100dvh;
+    width: 100%
+}

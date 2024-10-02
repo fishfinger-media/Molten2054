@@ -1,4 +1,8 @@
+.swiper-slide {
+    scale:0.8;
+    transition: all 0.5s ease-in-out;
+}
 
-.nav-content {
-    opacity: 0;
+.swiper-slide-active {
+    scale: 1;
 }

@@ -1,28 +1,61 @@
 import './styles/style.css'
 
 import { gsap } from "gsap";
-    
 import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from 'lenis'
+import SplitType from 'split-type';
+import Swiper from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
 
 
 gsap.registerPlugin(Flip,ScrollTrigger);
 
 
-const originalContainer = document.querySelector('.hero-elements_wrapper');
-const newContainer = document.querySelector('.main-content_earth-container');
-const img = document.querySelector('.hero-elements_content');
+const lenis = new Lenis()
+function raf(time) {
+  lenis.raf(time)
+  requestAnimationFrame(raf)
+}
+requestAnimationFrame(raf)
 
-document.querySelector('[home-hero="button"]').addEventListener('click',()=>{
 
-    const state = Flip.getState(img);
+const sections = document.querySelectorAll('[gsap-section]');
+sections.forEach((section) => {
+  const mainText = new SplitType(section.querySelector('[gsap-heading]'), { types: 'chars' });
+  
+  let sectionAnimation = gsap.timeline();
 
-    newContainer.appendChild(img);
-    
-    Flip.from(state, {
-        duration: 1,
-        ease: "power1.inOut",
-        scale: true
-    });
+  // Animate the characters of the heading
+  sectionAnimation.from(mainText.chars, { opacity: 0, y: 20, duration: 0.5, stagger: { amount: 2 } })
+                  .from(section.querySelector('[gsap-pre]'), { opacity: 0, y: 20, duration: 0.5 }, 0)
+                  .from(section.querySelector('[gsap-button]'), { opacity: 0, y: 40, duration: 0.5 }, 0)
+                  .from(section.querySelector('.container-lines'), { height: 0, duration: 1 }, 0)
 
+
+  // Create the ScrollTrigger for the section
+  ScrollTrigger.create({
+    trigger: section, // Use the current section as the trigger
+    start: 'top center', 
+    end: 'bottom top',
+    animation: sectionAnimation, 
+    markers: false,
+  });
 });
+
+
+
+
+// HOME SWIPER
+if (document.querySelector('.swiper.is-homeportfolio')) {
+
+  const swiper = new Swiper('.swiper.is-homeportfolio', {
+    centeredSlides: true,
+    slidesPerView: '1.5',
+    loop: true,
+    autoplay: {
+      delay: 2000,
+    },
+    
+  });
+};
