@@ -5,14 +5,38 @@ body {
     min-height: 100vh;
 }
 
-video {
-    
+.video-wrapper {
+    position: relative;
+    width: 640px; /* Adjust as needed */
+    margin: auto;
 }
 
-.video-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100dvh;
-    width: 100%
+video {
+    width: 100%;
+    height: auto;
+}
+
+.controls {
+    position: relative;
+    margin-top: 10px;
+}
+
+.timeline {
+    position: relative;
+    height: 5px; /* Height of the timeline */
+    background-color: #ddd; /* Background color of the timeline */
+    margin-bottom: 10px;
+}
+
+.line {
+    position: absolute;
+    width: 2px; /* Width of the vertical lines */
+    height: 100%; /* Full height of the timeline */
+    background-color: #333; /* Color of the vertical lines */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
