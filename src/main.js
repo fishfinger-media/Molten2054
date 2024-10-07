@@ -7,57 +7,79 @@ import Lenis from 'lenis'
 import SplitType from 'split-type';
 import Swiper from 'swiper';
 import { Navigation } from 'swiper/modules';
+import barba from '@barba/core';
 import * as THREE from 'three';
+import { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2 } from 'three';
 
 
+if (document.querySelector('#videomain')) {
 
   const prevideo = document.getElementById('videomain');
-
   prevideo.load();
-
-
-gsap.registerPlugin(Flip,ScrollTrigger);
-
-
-const lenis = new Lenis()
-function raf(time) {
-  lenis.raf(time)
-  requestAnimationFrame(raf)
 }
-requestAnimationFrame(raf)
+
+gsap.registerPlugin(Flip, ScrollTrigger);
+
+
+// const lenis = new Lenis()
+// function raf(time) {
+//   lenis.raf(time)
+//   requestAnimationFrame(raf)
+// }
+// requestAnimationFrame(raf)
 
 
 const sections = document.querySelectorAll('[gsap-section]');
 sections.forEach((section) => {
-  const mainText = new SplitType(section.querySelector('[gsap-heading]'), { types: 'chars' });
-  
+  const mainText = new SplitType(section.querySelector('[gsap-heading]'), {
+    types: 'chars'
+  });
+
   let sectionAnimation = gsap.timeline();
 
   // Animate the characters of the heading
-  sectionAnimation.from(mainText.chars, { opacity: 0, y: 20, duration: 0.5, stagger: { amount: 2 } })
-                  .from(section.querySelector('[gsap-pre]'), { opacity: 0, y: 20, duration: 0.5 }, 0)
-                  .from(section.querySelector('[gsap-button]'), { opacity: 0, y: 40, duration: 0.5 }, 0)
-                  .from(section.querySelector('.container-lines'), { height: 0, duration: 1 }, 0)
+  sectionAnimation.from(mainText.chars, {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      stagger: {
+        amount: 2
+      }
+    })
+    .from(section.querySelector('[gsap-pre]'), {
+      opacity: 0,
+      y: 20,
+      duration: 0.5
+    }, 0)
+    .from(section.querySelector('[gsap-button]'), {
+      opacity: 0,
+      y: 40,
+      duration: 0.5
+    }, 0)
+    .from(section.querySelector('.container-lines'), {
+      height: 0,
+      duration: 1
+    }, 0)
 
 
   // Create the ScrollTrigger for the section
   ScrollTrigger.create({
     trigger: section, // Use the current section as the trigger
-    start: 'top center', 
+    start: 'top center',
     end: 'bottom top',
-    animation: sectionAnimation, 
+    animation: sectionAnimation,
     markers: false,
   });
 });
-
-
 
 
 // HOME SWIPER
 if (document.querySelector('.swiper.is-homeportfolio')) {
 
   const swiper = new Swiper('.swiper.is-homeportfolio', {
-    
+
+    modules: [Navigation], 
+
     centeredSlides: true,
     slidesPerView: 'auto',
     spaceBetween: '0%',
@@ -70,9 +92,10 @@ if (document.querySelector('.swiper.is-homeportfolio')) {
       nextEl: '.swiper-nav.is-next',
       prevEl: '.swiper-nav.is-prev',
     },
-    
+
   });
 };
+
 
 // GSAP ScrollTrigger animation
 gsap.from('.portfolio_grid', {
@@ -99,8 +122,14 @@ const items = document.querySelectorAll('.portfolio_grid');
 
 // Function to handle mouse movement
 function mouseMoveHandler(event) {
-  const { clientX, clientY } = event;
-  const { left, top } = wrapper.getBoundingClientRect();
+  const {
+    clientX,
+    clientY
+  } = event;
+  const {
+    left,
+    top
+  } = wrapper.getBoundingClientRect();
 
   // Calculate the mouse position relative to the wrapper
   const mouseX = clientX - left;
@@ -133,7 +162,7 @@ function mouseMoveHandler(event) {
 wrapper.addEventListener('mousemove', mouseMoveHandler);
 
 
-gsap.to('.portfolio_grid-wrapper', { 
+gsap.to('.portfolio_grid-wrapper', {
   scale: 0.8,
   opacity: 0,
   duration: 1,
@@ -142,13 +171,13 @@ gsap.to('.portfolio_grid-wrapper', {
     start: 'bottom 50%',
     end: 'bottom 20%',
     scrub: true,
-    markers: true,
+    markers: false,
 
-    } 
-  });
+  }
+});
 
 
-  // video
+// video
 
 const video = document.getElementById('videomain');
 const timelineWrapper = document.querySelector('.timeline-wrapper');
@@ -158,7 +187,7 @@ const playBtn = document.querySelector('[toggle-play]');
 // TOGGLE VIDEO
 function togglePlay() {
   const method = video.paused ? 'play' : 'pause';
-  
+
   playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
   video[method]();
 }
@@ -174,16 +203,16 @@ function toggleSound() {
 function videoPlayer() {
 
   const tickers = document.querySelectorAll('.ticker');
-  
+
   function handleMouseMove(event) {
     const rect = timelineWrapper.getBoundingClientRect();
     const mouseX = event.clientX;
-  
+
     tickers.forEach((ticker) => {
       const tickerRect = ticker.getBoundingClientRect();
       const tickerCenter = tickerRect.left + tickerRect.width;
       const distance = Math.abs(mouseX - tickerCenter);
-  
+
       let scaleY;
       if (distance < 10) {
         scaleY = 2;
@@ -196,7 +225,7 @@ function videoPlayer() {
       } else {
         scaleY = 1;
       }
-  
+
       gsap.to(ticker, {
         scaleY: scaleY,
         duration: 0.5,
@@ -204,7 +233,7 @@ function videoPlayer() {
       });
     });
   }
-  
+
   function resetTickers() {
     tickers.forEach((ticker) => {
       gsap.to(ticker, {
@@ -214,18 +243,18 @@ function videoPlayer() {
       });
     });
   }
-  
+
   timelineWrapper.addEventListener('mousemove', handleMouseMove);
   timelineWrapper.addEventListener('mouseleave', resetTickers);
-  
+
   // UPDATE TIMELINE PROGRESS
   video.addEventListener('timeupdate', () => {
     const duration = video.duration;
     const currentTime = video.currentTime;
-  
+
     const progress = currentTime / duration;
     const tickersToHighlight = Math.floor(progress * tickers.length);
-  
+
     tickers.forEach((ticker, index) => {
       if (index < tickersToHighlight) {
         ticker.style.backgroundColor = 'rgba(255, 255, 255, 1)';
@@ -234,19 +263,19 @@ function videoPlayer() {
       }
     });
   });
-  
+
   // SCRUB TIMELINE
   timelineWrapper.addEventListener('click', (event) => {
     const rect = timelineWrapper.getBoundingClientRect();
     const clickPosition = event.clientX - rect.left; // Position of the click on the timeline
     const timelineWidth = rect.width; // Total width of the timeline
-  
+
     const clickPercentage = clickPosition / timelineWidth; // Percentage of the timeline that was clicked
     const newTime = clickPercentage * video.duration; // Map click to video duration
-  
+
     video.currentTime = newTime; // Set video time to the clicked position
   });
-  }
+}
 
 //VIDEO TIMELINE GENERATOR
 function tickerGenerator() {
@@ -275,8 +304,8 @@ soundButton.addEventListener('click', toggleSound);
 video.addEventListener('click', togglePlay);
 playBtn.addEventListener('click', togglePlay);
 
-document.querySelector('[playvideo]').addEventListener('click', function() {
-  
+document.querySelector('[playvideo]').addEventListener('click', function () {
+
 
   gsap.to('.popup-overlay_wrapper', {
     display: 'flex',
@@ -286,13 +315,93 @@ document.querySelector('[playvideo]').addEventListener('click', function() {
 
   gsap.to('.popup-video_container', {
     scale: 1,
+    opacity: 1,
     duration: 0.5,
     ease: "power2.out",
     onComplete: () => {
-      tickerGenerator()
-  
+      setTimeout(tickerGenerator, 1000)
+
     }
   })
 
- 
+
 });
+
+function closePopup() {
+
+  const popuptl = gsap.timeline();
+
+  popuptl.to('.popup-video_container', {
+    scale: 0.8,
+    opacity: 0,
+    duration: 0.5,
+    ease: "power2.out",
+  })
+
+  popuptl.to('.popup-overlay_wrapper', {
+    opacity: 0,
+    duration: 0.5,
+    onComplete: () => {
+      gsap.to('.popup-overlay_wrapper', {
+        display: 'none',
+        
+      })
+      togglePlay()
+      document.querySelectorAll('.ticker').forEach(el => el.remove())
+
+    }
+
+
+
+  }, 0)
+
+};
+
+document.querySelector('[toggle-modal]').addEventListener('click', function () {
+  closePopup()
+})
+
+
+barba.init({
+  transitions: [{
+    name: 'opacity-transition',
+    sync: true,
+    
+    leave(data) {
+      // Animate the current container out
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    beforeEnter(data) {
+      // Reset scroll position to top before entering the new page
+      window.scrollTo(0, 0);
+    },
+    async enter(data) {
+      // Animate the next container in
+      return gsap.from(data.next.container, {
+        opacity: 0
+
+      });
+
+      const currentImage = data.current.container.querySelector('.swiper-slide.is-homeportfolio.swiper-slide-active > .background-img');
+      const newContainer = data.next.container.querySelector('.portfolio_header-img-container');
+      const currentContainer = data.current.container.querySelector('.swiper-slide.is-homeportfolio.swiper-slide-active');
+
+      const state = Flip.getState(currentImage);
+
+      newContainer.appendChild(img);
+
+      Flip.from(state, {
+        duration: 1,
+        ease: "power1.inOut",
+        scale: true
+    });
+    
+    }
+  }]
+});
+
+
+
+// THREE JS
