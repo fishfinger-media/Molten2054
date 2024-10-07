@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from 'lenis'
 import SplitType from 'split-type';
 import Swiper from 'swiper';
+<<<<<<< HEAD
 import { Navigation } from 'swiper/modules';
 import * as THREE from 'three';
 
@@ -14,6 +15,11 @@ import * as THREE from 'three';
   const prevideo = document.getElementById('videomain');
 
   prevideo.load();
+=======
+import { Navigation, Pagination } from 'swiper/modules';
+import Scrambler from 'scrambling-text';
+
+>>>>>>> df2303b744a72c843a86e1e92bf5aed98d191eda
 
 
 gsap.registerPlugin(Flip,ScrollTrigger);
@@ -29,12 +35,12 @@ requestAnimationFrame(raf)
 
 const sections = document.querySelectorAll('[gsap-section]');
 sections.forEach((section) => {
-  const mainText = new SplitType(section.querySelector('[gsap-heading]'), { types: 'chars' });
+  const mainText = new SplitType(section.querySelector('[gsap-heading]'), { types: 'words, chars' });
   
   let sectionAnimation = gsap.timeline();
 
   // Animate the characters of the heading
-  sectionAnimation.from(mainText.chars, { opacity: 0, y: 20, duration: 0.5, stagger: { amount: 2 } })
+  sectionAnimation.from(mainText.chars, { opacity: 0, duration: 0.5, stagger: { amount: 2 } })
                   .from(section.querySelector('[gsap-pre]'), { opacity: 0, y: 20, duration: 0.5 }, 0)
                   .from(section.querySelector('[gsap-button]'), { opacity: 0, y: 40, duration: 0.5 }, 0)
                   .from(section.querySelector('.container-lines'), { height: 0, duration: 1 }, 0)
@@ -74,6 +80,7 @@ if (document.querySelector('.swiper.is-homeportfolio')) {
   });
 };
 
+<<<<<<< HEAD
 // GSAP ScrollTrigger animation
 gsap.from('.portfolio_grid', {
   scale: 1,
@@ -296,3 +303,6 @@ document.querySelector('[playvideo]').addEventListener('click', function() {
 
  
 });
+=======
+
+>>>>>>> df2303b744a72c843a86e1e92bf5aed98d191eda

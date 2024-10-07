@@ -18,6 +18,7 @@
     "lenis": "^1.1.13",
     "npm": "^10.8.3",
     "plyr": "^3.7.8",
+    "scrambling-text": "^1.2.0",
     "split-type": "^0.2.5",
     "swiper": "^11.1.14",
     "three": "^0.169.0"
