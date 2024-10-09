@@ -15,13 +15,8 @@
   "dependencies": {
     "@barba/core": "^2.10.3",
     "gsap": "^3.12.5",
-    "i": "^0.3.7",
     "lenis": "^1.1.13",
-    "npm": "^10.8.3",
-    "plyr": "^3.7.8",
-    "scrambling-text": "^1.2.0",
-    "split-type": "^0.2.5",
-    "swiper": "^11.1.14",
-    "three": "^0.169.0"
+    "split-type": "^0.3.4",
+    "swiper": "^11.1.14"
   }
 }
