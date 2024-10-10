@@ -1,13 +1,22 @@
-import './styles/style.css'
 
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from 'lenis'
+import { CustomEase } from "gsap/CustomEase";
+import Lenis from 'lenis';
 import barba from '@barba/core';
+import Swiper from 'swiper';
+import { Navigation } from 'swiper/modules';
+import { Autoplay } from "swiper/modules";
 
+gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 
-gsap.registerPlugin(Flip, ScrollTrigger);
+const lenis = new Lenis()
+function raf(time) {
+  lenis.raf(time)
+  requestAnimationFrame(raf)
+}
+requestAnimationFrame(raf)
 
 
 // NOISE
@@ -102,57 +111,9 @@ if (document.querySelector("#noise")) {
     noise();
     
   }
+    
   
-  
-  
-/* 
-  
-  [data-btn="load"]
-  [data-load="text"]
-  
-  .hero-logo_container
-  .nav-bar_logo-container
-  
-  
-  
-  const loadBtn = document.querySelector('[data-btn="load"]');
-  
-  loadBtn.addEventListener('click', () => { 
-  
-    loadBtn.style.opacity = '0';
-    loadBtn.style.pointerEvents = 'none';
-  
-    const textElement = document.querySelector('[data-load="text"]');
-  
-    gsap.to(textElement, { opacity: 0, duration: 0.5, onComplete: () => {
-      textElement.textContent = textElement.textContent = "What you are about to see is an imagined future";
-      gsap.to(textElement, { opacity: 1, duration: 0.5 });
-    }});
-  
-  
-      const originalContainer = document.querySelector('.loader-content_wrapper');
-      const newContainer = document.querySelector('.earth-content');
-      const img = document.querySelector('.loader-shapes_container');
-  
-  
-  
-        const state = Flip.getState(img);
-  
-        newContainer.appendChild(img);
-        
-        Flip.from(state, {
-            ease: "power1.inOut",
-            scale: true
-        });
-  
-  
-  });
-  
-  */
-  
-  
-  // NAV LOGO ANIMATION
-  
+// NAV LOGO ANIMATION
   if (document.querySelector('.logo-container')) {
   const originalNavContainer = document.querySelector('.logo-container'); // Original container
   const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
@@ -194,7 +155,7 @@ if (document.querySelector("#noise")) {
   }
   
   
-  // VIDEO CODE
+// VIDEO CODE
   if (document.querySelector('.section-home_video')) {
   
     const video = document.getElementById('videomain');
@@ -322,14 +283,15 @@ if (document.querySelector("#noise")) {
     soundButton.addEventListener('click', toggleSound);
     video.addEventListener('click', togglePlay);
     playBtn.addEventListener('click', togglePlay);
+    
   
     const videoSection = gsap.timeline({
       scrollTrigger: {
         trigger: '.section-home_video',
-        start: 'top 50%',
-        end: 'bottom 50%',
+        start: 'top 80%',
+        end: 'top -50%',
         markers: false,
-        toggleActions: 'play reverse play reverse'
+        scrub: true,
       }
     });
     
@@ -341,51 +303,26 @@ if (document.querySelector("#noise")) {
   
     videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
     videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
-    videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0);
-    videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut'});
-  }
-  if (document.querySelector('.portfolio-grid_wrapper')) {
-  const portfolioGridWrapper = document.querySelector('.portfolio-grid_wrapper');
-  const portfolioGrid = document.querySelector('.portfolio-grid');
-  
-  portfolioGridWrapper.addEventListener('mousemove', (e) => {
-      const rect = portfolioGridWrapper.getBoundingClientRect();
-      
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-  
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-  
-      const offsetX = (mouseX - centerX) * 0.05; 
-      const offsetY = (mouseY - centerY) * 0.05; 
-  
-   
-      gsap.to(portfolioGrid, {
-          x: offsetX,
-          y: offsetY,
-          duration: 3,
-          ease: "sine" 
-      });
-  });
-  
-  
-  gsap.from('.portfolio-grid', {
-    scale: 0.8,
-    opacity: 0,
-    y: 100,
-    duration: 1,
-    scrollTrigger: {
-      trigger: '.portfolio-grid_wrapper',
-      start: 'top 10%',
-      end: 'bottom 20%',
-      markers: false,
-      toggleActions: 'play reverse play reverse', 
-  
-    }
-  })
+    videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
+    videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut'},  0.5);
+
+    const videoSectionOut = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_video',
+        start: 'bottom 90%',
+        markers: false,
+        toggleActions: 'play none reverse none'
+      }
+    });
+
+    videoSectionOut.to('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0);
+    videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
+    videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
+    videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
+
   }
 
+// BARBA 
 barba.init({
     transitions: [
         {
@@ -424,7 +361,8 @@ barba.init({
             async enter(data) {
                 data.next.container.classList.add('is-transitioning');
 
-                const currentimg = data.current.container.querySelector('.background-img');
+                const currentImg = data.current.container.querySelector('.swiper-slide.swiper-slide-active .slide-content .background-img');
+
                 const newimg = data.next.container.querySelector('.background-img');
 
                 const currentImgParent = currentimg.parentElement;
@@ -453,30 +391,103 @@ barba.init({
     ],
 });
 
+// PORTFOLIO GRID
+if (document.querySelector('.portfolio-grid_wrapper')) {
+  const portfolioGridWrapper = document.querySelector('.portfolio-grid_wrapper');
+  const portfolioGrid = document.querySelector('.portfolio-grid');
+  
+  portfolioGridWrapper.addEventListener('mousemove', (e) => {
+      const rect = portfolioGridWrapper.getBoundingClientRect();
+      
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+  
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+  
+      const offsetX = (mouseX - centerX) * 0.05; 
+      const offsetY = (mouseY - centerY) * 0.05; 
+  
+   
+      gsap.to(portfolioGrid, {
+          x: offsetX,
+          y: offsetY,
+          duration: 3,
+          ease: "sine" 
+      });
+  });
+
+  gsap.from('.portfolio-grid_wrapper', {
+    opacity:0,
+    scale:0.8,
+    duration:1.5,
+    ease: CustomEase.create("custom", "M0,0 C0,0.05 0.25,1 1,1 "),
+    scrollTrigger: {
+      trigger: '.portfolio-grid_wrapper',
+      start: 'top 60%',
+      end: "bottom 40%",
+      markers:false,
+      toggleActions: "play reverse play reverse",
+      
+    }
+  })
+}
+
+// SWIPER
 
 
-const items = document.querySelectorAll('.portfolio-grid_item');
+if (document.querySelector('.swiper')) {
 
-items.forEach((item, index) => {
-    const angle = 10; // Adjust this value for more or less tilt
-    const centerX = 2; // Center column index for a 5x5 grid
-    const centerY = 2; // Center row index for a 5x5 grid
-    const maxDepth = 2; // Maximum depth for Z-axis positioning
+  const swiper = new Swiper('.swiper', {
 
-    const row = Math.floor(index / 5);
-    const col = index % 5;
+    modules: [Navigation, Autoplay], 
 
-    const deltaX = col - centerX;
-    const deltaY = row - centerY;
+    centeredSlides: true,
+    slidesPerView: 'auto',
+    spaceBetween: '0',
+    loop: true,
+   
+    navigation: {
+      nextEl: '.swiper-nav.is-next',
+      prevEl: '.swiper-nav.is-prev',
+    },
 
-    // Calculate rotation angles
-    const rotationX = -angle * deltaY; // Negative for leaning towards the center
-    const rotationY = -angle * deltaX; // Negative for leaning towards the center
+  });
+};
 
-    // Calculate Z position based on the distance from the center
-    // The further from the center, the closer to the viewer (lower Z value)
-    const z = maxDepth - Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
-    // Apply the rotation and Z position using GSAP
-    gsap.set(item, { rotationX: rotationX, rotationY: rotationY, z: z });
-});
+gsap.fromTo(
+  '.swiper-slide-prev',
+  { x: '20%' }, // Adjusted per your note
+  {
+    x: '0%',
+    scrollTrigger: {
+      trigger: '.section_home-slider',
+      start: 'top 80%',
+      end: 'top 20%',
+      onLeave: () => resetTransforms(), // Reset transforms when scrolling past the section
+      onLeaveBack: () => resetTransforms(), // Reset when scrolling back up
+    },
+  }
+);
+
+gsap.fromTo(
+  '.swiper-slide-next',
+  { x: '-20%' }, // Adjusted per your note
+  {
+    x: '0%',
+    scrollTrigger: {
+      trigger: '.section_home-slider',
+      start: 'top 80%',
+      end: 'top 20%',
+      markers: true,
+      onLeave: () => resetTransforms(),
+      onLeaveBack: () => resetTransforms(),
+    },
+  }
+);
+
+// Function to reset transforms on slides after the GSAP animation is complete
+function resetTransforms() {
+  gsap.set('.swiper-slide-prev, .swiper-slide-next', { clearProps: 'transform' });
+}
