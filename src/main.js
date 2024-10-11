@@ -324,72 +324,49 @@ if (document.querySelector("#noise")) {
 
 // BARBA 
 barba.init({
-    transitions: [
-        {
-            name: 'default',
+  transitions: [
+      {
+          name: 'portfolio-transition',
+          
+          sync: true,
 
-            async leave(data) {
-                console.log('leave');
-                console.log(data);
-                data.current.container.classList.add('is-transitioning'); // Add class before leaving
-                await gsap.to(data.current.container, { opacity: 0, duration: 1 });
-            },
+          async enter(data) {
+              data.next.container.classList.add('is-transitioning');
 
-            async enter(data) {
-                console.log('enter');
-                await gsap.to(data.next.container, { opacity: 1, duration: 1 });
-            },
+              const currentImg = data.current.container.querySelector('video[data-barba-img]');
+              const newImg = data.next.container.querySelector('.background-img');
 
-            async after(data) {
-                // Reset scroll position to the top
-                window.scrollTo(0, 0); // Reset to top
-                lenis.update(); // Assuming lenis is a smooth scroll library
-                data.current.container.classList.remove('is-transitioning'); // Remove class after transition
-                console.log('after');
-            },
-        },
-        {
-            name: 'portfolio-transition',
-            to: {
-                namespace: ['portfolio'],
-            },
-            from: {
-                namespace: ['home'],
-            },
-            sync: true,
+              if (!currentImg || !newImg) {
+                  console.error("Could not find the images to transition.");
+                  return;
+              }
 
-            async enter(data) {
-                data.next.container.classList.add('is-transitioning');
+              const currentImgParent = currentImg.parentElement;
+              const newImgParent = newImg.parentElement;
 
-                const currentImg = data.current.container.querySelector('.swiper-slide.swiper-slide-active .slide-content .background-img');
+              const state = Flip.getState(currentImg);
 
-                const newimg = data.next.container.querySelector('.background-img');
+              currentImgParent.style.height = `${currentImg.offsetHeight}px`;
 
-                const currentImgParent = currentimg.parentElement;
-                const newImgParent = newimg.parentElement;
+              newImg.remove();
+              newImgParent.appendChild(currentImg);
 
-                const state = Flip.getState(currentimg);
+              await Flip.from(state, { duration: 0.5 });
 
-                currentImgParent.style.height = `${currentimg.offsetHeight}px`;
+              data.next.container.classList.remove('is-transitioning'); // Remove class after transition
 
-                newimg.remove();
-                newImgParent.appendChild(currentimg);
+              console.log(data);
+          },
 
-                await Flip.from(state, { duration: 0.5 });
-
-                data.next.container.classList.remove('is-transitioning'); // Remove class after transition
-
-                console.log(data);
-            },
-
-            async after(data) {
-                // Reset scroll position to the top
-                window.scrollTo(0, 0); // Reset to top
-                console.log('after portfolio transition');
-            },
-        },
-    ],
+          async after(data) {
+              // Reset scroll position to the top
+              window.scrollTo(0, 0);
+              console.log('after portfolio transition');
+          },
+      },
+  ],
 });
+
 
 // PORTFOLIO GRID
 if (document.querySelector('.portfolio-grid_wrapper')) {
@@ -434,60 +411,150 @@ if (document.querySelector('.portfolio-grid_wrapper')) {
 }
 
 // SWIPER
-
-
 if (document.querySelector('.swiper')) {
 
   const swiper = new Swiper('.swiper', {
-
     modules: [Navigation, Autoplay], 
-
     centeredSlides: true,
     slidesPerView: 'auto',
     spaceBetween: '0',
     loop: true,
+    autoplay: {
+      delay: 5000,
+    },
    
     navigation: {
       nextEl: '.swiper-nav.is-next',
       prevEl: '.swiper-nav.is-prev',
     },
-
   });
+
+  // Trigger GSAP on Swiper initialization
+  swiper.init();
+  
+  gsap.set('.swiper-slide-active', {scale: 1})
+
+  // Handle scaling of the active slide during transitions
+  swiper.on('slideChangeTransitionStart', () => {
+    // Scale the active slide to 1
+    gsap.to('.swiper-slide-active', {
+      scale: 1,   
+      duration: 0.5,
+      ease: "power4.inOut"
+    });
+
+    // Scale the other slides to 0.7
+    gsap.to('.swiper-slide:not(.swiper-slide-active)', {
+      scale: 0.7,  
+      duration: 0.5,
+      ease: "power4.inOut"
+    });
+
+    // Update the #company text content with the active slide's data-company attribute
+    const activeSlide = document.querySelector('.swiper-slide-active');
+    const companyName = activeSlide.getAttribute('data-company');
+    document.getElementById('company').textContent = companyName;
+
+    // Remove data-barba-img from all .background-img elements
+    document.querySelectorAll('.background-img').forEach(img => {
+      img.removeAttribute('data-barba-img');
+    });
+
+    // Add data-barba-img to the .background-img inside the active slide
+    const activeSlideBgImg = activeSlide.querySelector('.background-img');
+    if (activeSlideBgImg) {
+      activeSlideBgImg.setAttribute('data-barba-img', '');
+    }
+  });
+
+  const swiperGsap = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.section_home-slider',
+      start: 'top 70%',
+      end: 'bottom 30%',
+      markers: false,
+      toggleActions: 'play reverse play reverse',
+    }
+  });
+
+  // Initial animation when the swiper enters the view
+  swiperGsap.from('.swiper', {
+    y: 150,
+    scale: 0.8,
+    opacity: 0,
+    duration: 1,
+    ease: "power4.inOut",
+  });
+
+  swiperGsap.from('.swiper-slide-prev', {x: '40%', duration: 0.5}, 0.4);
+  swiperGsap.from('.swiper-slide-next', {x: '-40%', duration: 0.5}, 0.4);
 };
 
+// FANCY LINKS
+document.querySelectorAll('[data-link]').forEach(element => {
+  element.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default behavior
+    const url = element.getAttribute('data-link');
+    if (url) {
+      barba.go(url);
+    }
+  });
+});
 
-gsap.fromTo(
-  '.swiper-slide-prev',
-  { x: '20%' }, // Adjusted per your note
-  {
-    x: '0%',
-    scrollTrigger: {
-      trigger: '.section_home-slider',
-      start: 'top 80%',
-      end: 'top 20%',
-      onLeave: () => resetTransforms(), // Reset transforms when scrolling past the section
-      onLeaveBack: () => resetTransforms(), // Reset when scrolling back up
-    },
-  }
-);
 
-gsap.fromTo(
-  '.swiper-slide-next',
-  { x: '-20%' }, // Adjusted per your note
-  {
-    x: '0%',
-    scrollTrigger: {
-      trigger: '.section_home-slider',
-      start: 'top 80%',
-      end: 'top 20%',
-      markers: true,
-      onLeave: () => resetTransforms(),
-      onLeaveBack: () => resetTransforms(),
-    },
-  }
-);
+// NAVIGATION
+let navbarStatus = false; // Track the status of the navbar
+document.querySelector('#nav-btn').addEventListener('click', function() {
+    // Check the current status of the navbar
+    if (!navbarStatus) {
+        // Open the navbar
+        gsap.to('.nav-grid_wrapper', {
+            display: 'grid',
+        });
 
-// Function to reset transforms on slides after the GSAP animation is complete
-function resetTransforms() {
-  gsap.set('.swiper-slide-prev, .swiper-slide-next', { clearProps: 'transform' });
-}
+        gsap.to('.grid-item', {
+            opacity: 1,
+            duration: 0.01,
+            stagger: { amount: 0.5, from: "random" },
+        });
+
+        gsap.set('.nav-menu_wrapper', { y: '100', opacity: 0 });
+
+        gsap.to('.nav-menu_wrapper', {
+            display: 'flex',
+            opacity: 1,
+            delay:0.5,
+            y: 0,
+            ease: "power4.inOut",
+            duration: 1,
+        });
+
+        navbarStatus = true; // Update the status to open
+    } else {
+        // Close the navbar
+        gsap.to('.nav-menu_wrapper', {
+            opacity: 0,
+            y: '100',
+            ease: "power4.inOut",
+
+            duration: 1,
+            onComplete: function() {
+                gsap.set('.nav-menu_wrapper', { display: 'none' }); // Hide it after animation
+            }
+        });
+
+        gsap.to('.grid-item', {
+            opacity: 0,
+            duration: 0.01,
+            delay:1,
+            stagger: { amount: 0.5, from: "random" },
+        });
+
+        gsap.to('.nav-grid_wrapper', {
+            display: 'none', // Optionally hide grid wrapper after closing
+            delay: 2, // Delay to allow animation to complete
+        });
+
+        navbarStatus = false; // Update the status to closed
+    }
+});
