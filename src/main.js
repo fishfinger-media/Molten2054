@@ -18,6 +18,25 @@ function raf(time) {
 }
 requestAnimationFrame(raf)
 
+// LOAD MUSIC
+var audio = new Audio();
+audio.src = 'https://s3.amazonaws.com/audio.mp3land.com/mp3/2019/01/07/mp3-2019-01-07-00-00-00.mp3';
+
+
+function toggleAudio() {
+  if (audio.paused) {
+    audio.play();
+  } else {
+    audio.pause();
+  }
+}
+
+document.querySelectorAll('.nav-bar_link.is-music').forEach(element => {
+  element.addEventListener('click', function() {
+    toggleAudio();
+  });
+});
+
 
 // NOISE
 if (document.querySelector("#noise")) {
@@ -621,3 +640,5 @@ gsap.to('.section_portfolio-text', {
     start: 'top 70%',
   }
 }) 
+
+
