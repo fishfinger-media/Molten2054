@@ -7,7 +7,7 @@ import Lenis from 'lenis';
 import barba from '@barba/core';
 import Swiper from 'swiper';
 import { Navigation } from 'swiper/modules';
-import { Autoplay } from "swiper/modules";
+import SplitType from "split-type";
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 
@@ -110,262 +110,303 @@ if (document.querySelector("#noise")) {
     };
     noise();
     
-  }
+};
     
+
+// HERO
+if (document.querySelector('.section-home_hero')) {
+
+  // Scroll Exit
+  const heroExit = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.section-home_hero',
+      start: 'bottom 95%',
+      end: 'bottom 10%',
+      scrub: true,
+      markers: false,
   
-// NAV LOGO ANIMATION
-  if (document.querySelector('.logo-container')) {
-  const originalNavContainer = document.querySelector('.logo-container'); // Original container
-  const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
-  const navLogo = document.querySelector('.logo');
-  
-  // Capture the initial state
-  const navState = Flip.getState(navLogo);
-  
-  // ScrollTrigger setup
-  ScrollTrigger.create({
-    trigger: '[data-nav="trigger"]',
-    start: 'top 80%',
-    end: 'top 20%',
-    markers: false,
-    onEnter: () => {
-      // Move the logo to the new container and animate it on scroll down
-      newNavContainer.appendChild(navLogo);
-  
-      Flip.from(navState, {
-        duration: 0.8,
-        scale: true,
-      });
-    },
-    onLeaveBack: () => {
-      // When scrolling back up, reverse the animation and move the logo back
-      const reverseState = Flip.getState(navLogo); // Capture the new state
-  
-      // Move the logo back to the original container
-      originalNavContainer.appendChild(navLogo);
-  
-      // Animate it back to its original state
-      Flip.from(reverseState, {
-        duration: 0.8,
-        scale: true,
-      });
     }
   });
   
-  }
+  heroExit.to('[data-load="text"]', {
+    rotate: 90,
+    y: 2000,
+    scale: 1.5,
+    opacity: 0,
+    duration: 1,
+  });
   
-  
-// VIDEO CODE
-  if (document.querySelector('.section-home_video')) {
-  
-    const video = document.getElementById('videomain');
-    const timelineWrapper = document.querySelector('.timeline-wrapper');
-    const soundButton = document.querySelector('[toggle-volume]');
-    const playBtn = document.querySelector('[toggle-play]');
-  
-    // TOGGLE VIDEO
-    function togglePlay() {
-      const method = video.paused ? 'play' : 'pause';
-  
-      playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
-      video[method]();
-    }
-  
-    // TOGGLE SOUND
-    function toggleSound() {
-      const soundButton = document.querySelector('[toggle-volume]');
-      video.muted = !video.muted; // Toggle the muted state
-      soundButton.innerText = video.muted ? 'Sound On' : 'Sound Off'; // Update button text
-    }
-  
-    // VIDEO PLAYER CONTROLS
-    function videoPlayer() {
-  
-      const tickers = document.querySelectorAll('.ticker');
-  
-      function handleMouseMove(event) {
-        const rect = timelineWrapper.getBoundingClientRect();
-        const mouseX = event.clientX;
-  
-        tickers.forEach((ticker) => {
-          const tickerRect = ticker.getBoundingClientRect();
-          const tickerCenter = tickerRect.left + tickerRect.width;
-          const distance = Math.abs(mouseX - tickerCenter);
-  
-          let scaleY;
-          if (distance < 10) {
-            scaleY = 2;
-          } else if (distance < 20) {
-            scaleY = 1.5;
-          } else if (distance < 30) {
-            scaleY = 1.2;
-          } else if (distance < 40) {
-            scaleY = 1.1;
-          } else {
-            scaleY = 1;
-          }
-  
-          gsap.to(ticker, {
-            scaleY: scaleY,
-            duration: 0.5,
-            transformOrigin: "bottom"
-          });
-        });
-      }
-  
-      function resetTickers() {
-        tickers.forEach((ticker) => {
-          gsap.to(ticker, {
-            scaleY: 1,
-            duration: 0.5,
-            transformOrigin: "bottom"
-          });
-        });
-      }
-  
-      timelineWrapper.addEventListener('mousemove', handleMouseMove);
-      timelineWrapper.addEventListener('mouseleave', resetTickers);
-  
-      // UPDATE TIMELINE PROGRESS
-      video.addEventListener('timeupdate', () => {
-        const duration = video.duration;
-        const currentTime = video.currentTime;
-  
-        const progress = currentTime / duration;
-        const tickersToHighlight = Math.floor(progress * tickers.length);
-  
-        tickers.forEach((ticker, index) => {
-          if (index < tickersToHighlight) {
-            ticker.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-          } else {
-            ticker.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-          }
-        });
-      });
-  
-      // SCRUB TIMELINE
-      timelineWrapper.addEventListener('click', (event) => {
-        const rect = timelineWrapper.getBoundingClientRect();
-        const clickPosition = event.clientX - rect.left; // Position of the click on the timeline
-        const timelineWidth = rect.width; // Total width of the timeline
-  
-        const clickPercentage = clickPosition / timelineWidth; // Percentage of the timeline that was clicked
-        const newTime = clickPercentage * video.duration; // Map click to video duration
-  
-        video.currentTime = newTime; // Set video time to the clicked position
-      });
-    }
-  
-    //VIDEO TIMELINE GENERATOR
-    function tickerGenerator() {
-      // Get the width of the container
-      const containerWidth = timelineWrapper.offsetWidth; // assuming 'timelineWrapper' is your container
-  
-      // Calculate how many tickers can fit (each ticker is 1px wide with a 10px gap)
-      const tickerWidth = 1;
-      const gap = 8;
-      const totalTickerSpace = tickerWidth + gap;
-  
-      // Calculate the number of tickers that can fit in the container
-      const numberOfTickers = Math.floor(containerWidth / totalTickerSpace);
-  
-      // CREATE TICKERS dynamically
-      for (let i = 1; i <= numberOfTickers; i++) {
-        const ticker = document.createElement('div');
-        ticker.classList.add('ticker');
-        timelineWrapper.appendChild(ticker);
-      }
-  
-      videoPlayer()
-    }
-  
-    setTimeout(tickerGenerator, 1000)
-    soundButton.addEventListener('click', toggleSound);
-    video.addEventListener('click', togglePlay);
-    playBtn.addEventListener('click', togglePlay);
-    
-  
-    const videoSection = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.section-home_video',
+  heroExit.to('.home_hero-earth_container', {
+    rotate: 90,
+    y: 2000,
+    scale: 1.5,
+    pointerEvents: 'none',
+    opacity: 0,
+    duration: 1,
+  }, 0);
+
+  // nav logo gsap flip 
+
+    const originalNavContainer = document.querySelector('.logo-container'); // Original container
+    const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
+    const navLogo = document.querySelector('.logo.is-hero');
+
+    gsap.set('.logo.is-nav', {display: 'none'});
+
+    // Capture the initial state
+    const navState = Flip.getState(navLogo);
+
+      // ScrollTrigger setup
+      ScrollTrigger.create({
+        trigger: '[data-nav="trigger"]',
         start: 'top 80%',
-        end: 'top -50%',
+        end: 'top 20%',
         markers: false,
-        scrub: true,
-      }
-    });
-    
-    videoSection.to('.page-wrapper', {
-      background: 'rgba(0, 0, 0, 1)',
-      duration: 1,
-      ease: 'power4.inOut'
-    });
-  
-    videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
-    videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
-    videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
-    videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut'},  0.5);
+        onEnter: () => {
+          newNavContainer.appendChild(navLogo);
+      
+          Flip.from(navState, {
+            duration: 0.8,
+            scale: true,
+          });
+        },
+        onLeaveBack: () => {
+          const reverseState = Flip.getState(navLogo); 
+      
+          originalNavContainer.appendChild(navLogo);
+      
+          Flip.from(reverseState, {
+            duration: 0.8,
+            scale: true,
+          });
+        }
+      });
 
-    const videoSectionOut = gsap.timeline({
+};  
+
+
+// INTRO
+if (document.querySelector('.section-home_intro')) {
+
+  gsap.from('.lines', {
+    height: 0,
+    duration: 2,
+    ease: "power4.inOut",  
+    scrollTrigger: {
+      trigger: '.section-home_intro',
+      start: 'top 60%',
+      markers: false,
+      toggleActions: 'play none reverse none'
+    }
+  })
+
+    const introSection = gsap.timeline({
       scrollTrigger: {
-        trigger: '.section-home_video',
-        start: 'bottom 90%',
-        markers: false,
-        toggleActions: 'play none reverse none'
+        trigger: '.section-home_intro',
+        start: 'top 20%',
+        markers: true,
+        toggleActions: 'play none none reset'
       }
+    })
+
+   
+
+    const paragraph = new SplitType('[gsap-heading]', { types: 'words, chars' });
+
+    introSection.from(paragraph.chars, {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      stagger: {
+        amount: 0.5
+      },
+      ease: "sine.inOut",
     });
 
-    videoSectionOut.to('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0);
-    videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
-    videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
-    videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
+    introSection.from('.section-home_intro h2', {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "sine.inOut",
+    }, 0);
+   
+   
+    introSection.from('[data-gsap="section-btn"]', {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "sine.inOut",
+    }, 0);
+    
+};
 
+
+// VIDEO SECTION
+if (document.querySelector('.section-home_video')) {
+  
+  const video = document.getElementById('videomain');
+  const timelineWrapper = document.querySelector('.timeline-wrapper');
+  const soundButton = document.querySelector('[toggle-volume]');
+  const playBtn = document.querySelector('[toggle-play]');
+
+  // TOGGLE VIDEO
+  function togglePlay() {
+    const method = video.paused ? 'play' : 'pause';
+
+    playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
+    video[method]();
   }
 
-// BARBA 
-barba.init({
-  transitions: [
-      {
-          name: 'portfolio-transition',
-          
-          sync: true,
+  // TOGGLE SOUND
+  function toggleSound() {
+    const soundButton = document.querySelector('[toggle-volume]');
+    video.muted = !video.muted; // Toggle the muted state
+    soundButton.innerText = video.muted ? 'Sound On' : 'Sound Off'; // Update button text
+  }
 
-          async enter(data) {
-              data.next.container.classList.add('is-transitioning');
+  // VIDEO PLAYER CONTROLS
+  function videoPlayer() {
 
-              const currentImg = data.current.container.querySelector('video[data-barba-img]');
-              const newImg = data.next.container.querySelector('.background-img');
+    const tickers = document.querySelectorAll('.ticker');
 
-              if (!currentImg || !newImg) {
-                  console.error("Could not find the images to transition.");
-                  return;
-              }
+    function handleMouseMove(event) {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const mouseX = event.clientX;
 
-              const currentImgParent = currentImg.parentElement;
-              const newImgParent = newImg.parentElement;
+      tickers.forEach((ticker) => {
+        const tickerRect = ticker.getBoundingClientRect();
+        const tickerCenter = tickerRect.left + tickerRect.width;
+        const distance = Math.abs(mouseX - tickerCenter);
 
-              const state = Flip.getState(currentImg);
+        let scaleY;
+        if (distance < 10) {
+          scaleY = 2;
+        } else if (distance < 20) {
+          scaleY = 1.5;
+        } else if (distance < 30) {
+          scaleY = 1.2;
+        } else if (distance < 40) {
+          scaleY = 1.1;
+        } else {
+          scaleY = 1;
+        }
 
-              currentImgParent.style.height = `${currentImg.offsetHeight}px`;
+        gsap.to(ticker, {
+          scaleY: scaleY,
+          duration: 0.5,
+          transformOrigin: "bottom"
+        });
+      });
+    }
 
-              newImg.remove();
-              newImgParent.appendChild(currentImg);
+    function resetTickers() {
+      tickers.forEach((ticker) => {
+        gsap.to(ticker, {
+          scaleY: 1,
+          duration: 0.5,
+          transformOrigin: "bottom"
+        });
+      });
+    }
 
-              await Flip.from(state, { duration: 0.5 });
+    timelineWrapper.addEventListener('mousemove', handleMouseMove);
+    timelineWrapper.addEventListener('mouseleave', resetTickers);
 
-              data.next.container.classList.remove('is-transitioning'); // Remove class after transition
+    // UPDATE TIMELINE PROGRESS
+    video.addEventListener('timeupdate', () => {
+      const duration = video.duration;
+      const currentTime = video.currentTime;
 
-              console.log(data);
-          },
+      const progress = currentTime / duration;
+      const tickersToHighlight = Math.floor(progress * tickers.length);
 
-          async after(data) {
-              // Reset scroll position to the top
-              window.scrollTo(0, 0);
-              console.log('after portfolio transition');
-          },
-      },
-  ],
-});
+      tickers.forEach((ticker, index) => {
+        if (index < tickersToHighlight) {
+          ticker.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+        } else {
+          ticker.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+        }
+      });
+    });
+
+    // SCRUB TIMELINE
+    timelineWrapper.addEventListener('click', (event) => {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const clickPosition = event.clientX - rect.left; // Position of the click on the timeline
+      const timelineWidth = rect.width; // Total width of the timeline
+
+      const clickPercentage = clickPosition / timelineWidth; // Percentage of the timeline that was clicked
+      const newTime = clickPercentage * video.duration; // Map click to video duration
+
+      video.currentTime = newTime; // Set video time to the clicked position
+    });
+  }
+
+  //VIDEO TIMELINE GENERATOR
+  function tickerGenerator() {
+    // Get the width of the container
+    const containerWidth = timelineWrapper.offsetWidth; // assuming 'timelineWrapper' is your container
+
+    // Calculate how many tickers can fit (each ticker is 1px wide with a 10px gap)
+    const tickerWidth = 1;
+    const gap = 8;
+    const totalTickerSpace = tickerWidth + gap;
+
+    // Calculate the number of tickers that can fit in the container
+    const numberOfTickers = Math.floor(containerWidth / totalTickerSpace);
+
+    // CREATE TICKERS dynamically
+    for (let i = 1; i <= numberOfTickers; i++) {
+      const ticker = document.createElement('div');
+      ticker.classList.add('ticker');
+      timelineWrapper.appendChild(ticker);
+    }
+
+    videoPlayer()
+  }
+
+  setTimeout(tickerGenerator, 1000)
+  soundButton.addEventListener('click', toggleSound);
+  video.addEventListener('click', togglePlay);
+  playBtn.addEventListener('click', togglePlay);
+  
+
+  const videoSection = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.section-home_video',
+      start: 'top 80%',
+      end: 'top -50%',
+      markers: false,
+      scrub: true,
+    }
+  });
+  
+  videoSection.to('.page-wrapper', {
+    background: 'rgba(0, 0, 0, 1)',
+    duration: 1,
+    ease: 'power4.inOut'
+  });
+
+  videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
+  videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
+  videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
+  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut'},  0.5);
+
+  const videoSectionOut = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.section-home_video',
+      start: 'bottom 90%',
+      markers: false,
+      toggleActions: 'play none reverse none'
+    }
+  });
+
+  videoSectionOut.to('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0);
+  videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
+  videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
+  videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
+
+}
 
 
 // PORTFOLIO GRID
@@ -414,15 +455,12 @@ if (document.querySelector('.portfolio-grid_wrapper')) {
 if (document.querySelector('.swiper')) {
 
   const swiper = new Swiper('.swiper', {
-    modules: [Navigation, Autoplay], 
+    modules: [Navigation], 
     centeredSlides: true,
     slidesPerView: 'auto',
     spaceBetween: '0',
     loop: true,
-    autoplay: {
-      delay: 5000,
-    },
-   
+    
     navigation: {
       nextEl: '.swiper-nav.is-next',
       prevEl: '.swiper-nav.is-prev',
@@ -432,25 +470,20 @@ if (document.querySelector('.swiper')) {
   // Trigger GSAP on Swiper initialization
   swiper.init();
   
-  gsap.set('.swiper-slide-active', {scale: 1})
+  gsap.set('.swiper-slide-active', {scale: 1});
 
-  // Handle scaling of the active slide during transitions
+  // Ensure the first active slide has data-barba-img
+  const firstActiveSlide = document.querySelector('.swiper-slide-active');
+  const firstSlideBgImg = firstActiveSlide.querySelector('.background-img');
+  if (firstSlideBgImg) {
+    firstSlideBgImg.setAttribute('data-barba-img', '');
+  }
+
   swiper.on('slideChangeTransitionStart', () => {
-    // Scale the active slide to 1
-    gsap.to('.swiper-slide-active', {
-      scale: 1,   
-      duration: 0.5,
-      ease: "power4.inOut"
-    });
+    // Your existing slide change logic
+    gsap.to('.swiper-slide-active', { scale: 1, duration: 0.5, ease: "power4.inOut" });
+    gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.5, ease: "power4.inOut" });
 
-    // Scale the other slides to 0.7
-    gsap.to('.swiper-slide:not(.swiper-slide-active)', {
-      scale: 0.7,  
-      duration: 0.5,
-      ease: "power4.inOut"
-    });
-
-    // Update the #company text content with the active slide's data-company attribute
     const activeSlide = document.querySelector('.swiper-slide-active');
     const companyName = activeSlide.getAttribute('data-company');
     document.getElementById('company').textContent = companyName;
@@ -467,6 +500,7 @@ if (document.querySelector('.swiper')) {
     }
   });
 
+  // Initial animation for swiper
   const swiperGsap = gsap.timeline({
     scrollTrigger: {
       trigger: '.section_home-slider',
@@ -477,7 +511,6 @@ if (document.querySelector('.swiper')) {
     }
   });
 
-  // Initial animation when the swiper enters the view
   swiperGsap.from('.swiper', {
     y: 150,
     scale: 0.8,
@@ -485,10 +518,49 @@ if (document.querySelector('.swiper')) {
     duration: 1,
     ease: "power4.inOut",
   });
-
   swiperGsap.from('.swiper-slide-prev', {x: '40%', duration: 0.5}, 0.4);
   swiperGsap.from('.swiper-slide-next', {x: '-40%', duration: 0.5}, 0.4);
-};
+}
+
+// Initialize Barba after Swiper setup to ensure first active slide is correctly set
+barba.init({
+  transitions: [
+      {
+          name: 'portfolio-transition',
+          sync: true,
+          async enter(data) {
+              data.next.container.classList.add('is-transitioning');
+
+              const currentImg = data.current.container.querySelector('video[data-barba-img]');
+              const newImg = data.next.container.querySelector('.background-img');
+
+              if (!currentImg || !newImg) {
+                  console.error(currentImg);
+                  return;
+              }
+
+              const currentImgParent = currentImg.parentElement;
+              const newImgParent = newImg.parentElement;
+
+              const state = Flip.getState(currentImg);
+
+              currentImgParent.style.height = `${currentImg.offsetHeight}px`;
+
+              newImg.remove();
+              newImgParent.appendChild(currentImg);
+
+              await Flip.from(state, { duration: 0.5 });
+
+              data.next.container.classList.remove('is-transitioning');
+          },
+          async after(data) {
+              window.scrollTo(0, 0);
+              console.log('after portfolio transition');
+          },
+      },
+  ],
+});
+
 
 // FANCY LINKS
 document.querySelectorAll('[data-link]').forEach(element => {
@@ -508,15 +580,7 @@ document.querySelector('#nav-btn').addEventListener('click', function() {
     // Check the current status of the navbar
     if (!navbarStatus) {
         // Open the navbar
-        gsap.to('.nav-grid_wrapper', {
-            display: 'grid',
-        });
-
-        gsap.to('.grid-item', {
-            opacity: 1,
-            duration: 0.01,
-            stagger: { amount: 0.5, from: "random" },
-        });
+    
 
         gsap.set('.nav-menu_wrapper', { y: '100', opacity: 0 });
 
@@ -543,18 +607,9 @@ document.querySelector('#nav-btn').addEventListener('click', function() {
             }
         });
 
-        gsap.to('.grid-item', {
-            opacity: 0,
-            duration: 0.01,
-            delay:1,
-            stagger: { amount: 0.5, from: "random" },
-        });
-
-        gsap.to('.nav-grid_wrapper', {
-            display: 'none', // Optionally hide grid wrapper after closing
-            delay: 2, // Delay to allow animation to complete
-        });
+    
 
         navbarStatus = false; // Update the status to closed
     }
 });
+
