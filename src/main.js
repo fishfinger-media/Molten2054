@@ -601,31 +601,96 @@ document.querySelector('#nav-btn').addEventListener('click', function() {
         // Open the navbar
     
 
-        gsap.set('.nav-menu_wrapper', { y: '100', opacity: 0 });
+        gsap.set('.nav-menu_wrapper', { opacity: 0 });
+        // gsap.set('.nav-link', { opacity: 0, y: 40 });
 
-        gsap.to('.nav-menu_wrapper', {
+        const navOpen = gsap.timeline();
+
+        navOpen.to('.nav-menu_wrapper', {
             display: 'flex',
             opacity: 1,
-            delay:0.5,
-            y: 0,
+            duration: 0.5,
             ease: "power4.inOut",
-            duration: 1,
-        });
+        }) 
+
+        navOpen.from('.logo', {
+          opacity:0,
+          duration: 1
+        }, 0)
+
+        navOpen.from('[data-gsap="nav"]', {
+          opacity:0,
+          y:'40',
+          duration: 1,
+          stagger: {
+            amount: 0.25,
+          },
+          ease: "power4.inOut"
+        }, '0')
+
+        navOpen.from('.nav-menu_shape-wrapper', {
+          opacity:0,
+          x:'40',
+          duration: 1,
+        }, 0)
+        
+        navOpen.from('.nav-menu_divider', {
+          height:0,
+          duration: 1,
+          ease: "power4.inOut"
+
+        }, 0.2)
+
+
+        
+
 
         navbarStatus = true; // Update the status to open
     } else {
-        // Close the navbar
-        gsap.to('.nav-menu_wrapper', {
-            opacity: 0,
-            y: '100',
-            ease: "power4.inOut",
+        
 
-            duration: 1,
-            onComplete: function() {
-                gsap.set('.nav-menu_wrapper', { display: 'none' }); // Hide it after animation
-            }
-        });
+      const navClose = gsap.timeline();
 
+      navClose.to('.nav-menu_divider', {
+        height:0,
+        duration: 1,
+        ease: "power4.inOut"
+      }, 0)
+
+      navClose.to('.nav-menu_shape-wrapper', {
+        opacity:0,
+        x:'40',
+        duration: 1,
+      }, 0)
+    
+      navClose.to('[data-gsap="nav"]', {
+        opacity:0,
+        y:'40',
+        duration: 1,
+        stagger: {
+          amount: 0.25,
+        },
+        ease: "power4.inOut"
+      }, '0')
+
+      navClose.to('.logo', {
+        opacity:1,
+        duration: 1
+      }, 0)
+      
+      
+      navClose.to('.nav-menu_wrapper', {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power4.inOut",
+        onComplete: function() {
+          gsap.set('.nav-menu_wrapper', { display: 'none' }); // Hide it after animation
+          gsap.set('.logo', { clearProps: "all"  });
+          gsap.set('[data-gsap="nav"]', { clearProps: "all"  });
+          gsap.set('.nav-menu_divider', { clearProps: "all"  });
+          gsap.set('.nav-menu_shape-wrapper', { clearProps: "all"  });
+      }
+    }) 
     
 
         navbarStatus = false; // Update the status to closed
@@ -643,30 +708,33 @@ gsap.to('.section_portfolio-text', {
 
 
 // NAV LINK HOVER
-const navText = new SplitType('.nav-link', { types: 'words, chars' });
+const navLinks = document.querySelectorAll('.nav-link'); // Select all nav-link elements
 
-const handleHoverIn = () => {
-  gsap.to(navText.chars, {
-    y: '-100%',
-    duration: 1,
-    stagger: {
-      amount: 0.5
-    },
-    ease: "power4.inOut",
-  });
-};
+navLinks.forEach(navLink => {
+  const navText = new SplitType(navLink, { types: 'words, chars' }); // Create SplitType instance for each nav link
 
-const handleHoverOut = () => {
-  gsap.to(navText.chars, {
-    y: '0%',
-    duration: 1,
-    stagger: {
-      amount: 0.5
-    },
-    ease: "power4.inOut",
-  });
-};
+  const handleHoverIn = () => {
+    gsap.to(navText.chars, {
+      y: '-100%',
+      duration: 1,
+      stagger: {
+        amount: 0.5
+      },
+      ease: "power4.inOut",
+    });
+  };
 
-const navLinkElement = document.querySelector('.nav-link');
-navLinkElement.addEventListener('mouseenter', handleHoverIn);
-navLinkElement.addEventListener('mouseleave', handleHoverOut);
+  const handleHoverOut = () => {
+    gsap.to(navText.chars, {
+      y: '0%',
+      duration: 1,
+      stagger: {
+        amount: 0.5
+      },
+      ease: "power4.inOut",
+    });
+  };
+
+  navLink.addEventListener('mouseenter', handleHoverIn);
+  navLink.addEventListener('mouseleave', handleHoverOut);
+});
