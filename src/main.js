@@ -642,3 +642,31 @@ gsap.to('.section_portfolio-text', {
 }) 
 
 
+// NAV LINK HOVER
+const navText = new SplitType('.nav-link', { types: 'words, chars' });
+
+const handleHoverIn = () => {
+  gsap.to(navText.chars, {
+    y: '-100%',
+    duration: 1,
+    stagger: {
+      amount: 0.5
+    },
+    ease: "power4.inOut",
+  });
+};
+
+const handleHoverOut = () => {
+  gsap.to(navText.chars, {
+    y: '0%',
+    duration: 1,
+    stagger: {
+      amount: 0.5
+    },
+    ease: "power4.inOut",
+  });
+};
+
+const navLinkElement = document.querySelector('.nav-link');
+navLinkElement.addEventListener('mouseenter', handleHoverIn);
+navLinkElement.addEventListener('mouseleave', handleHoverOut);
