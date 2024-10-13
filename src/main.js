@@ -613,3 +613,11 @@ document.querySelector('#nav-btn').addEventListener('click', function() {
     }
 });
 
+gsap.to('.section_portfolio-text', {
+  height:0,
+  duration: 1,
+  scrollTrigger: {
+    trigger: '.section_portfolio-text',
+    start: 'top 70%',
+  }
+}) 
