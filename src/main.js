@@ -149,7 +149,7 @@ if (document.querySelector('.section-home_hero')) {
     }
   });
   
-  heroExit.to('.hero-earth_circle', {
+  heroExit.to('[data-gsap="hero-earth-circle"]', {
     rotate: 90,
     y: 2000,
     scale: 2,
@@ -170,6 +170,10 @@ if (document.querySelector('.section-home_hero')) {
   heroExit.to('.earth-content', {
     rotate: '-90',
     duration:1,
+  },0)
+
+  heroExit.to('[data-load="text"]', {
+    opacity:0,
   },0)
 
   // nav logo gsap flip 
