@@ -19,7 +19,6 @@ function raf(time) {
 requestAnimationFrame(raf)
 
 
-
 // LOAD MUSIC
 var audio = new Audio();
 audio.src = 'https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3';
@@ -178,43 +177,48 @@ if (document.querySelector('.section-home_hero')) {
 
   // nav logo gsap flip 
 
-    const originalNavContainer = document.querySelector('.logo-container'); // Original container
-    const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
-    const navLogo = document.querySelector('.logo.is-hero');
-
-    gsap.set('.logo.is-nav', {display: 'none'});
-
-    // Capture the initial state
-    const navState = Flip.getState(navLogo);
-
-      // ScrollTrigger setup
-      ScrollTrigger.create({
-        trigger: '[data-nav="trigger"]',
-        start: 'top 80%',
-        end: 'top 20%',
-        markers: false,
-        onEnter: () => {
-          newNavContainer.appendChild(navLogo);
-      
-          Flip.from(navState, {
-            duration: 0.8,
-            scale: true,
-          });
-        },
-        onLeaveBack: () => {
-          const reverseState = Flip.getState(navLogo); 
-      
-          originalNavContainer.appendChild(navLogo);
-      
-          Flip.from(reverseState, {
-            duration: 0.8,
-            scale: true,
-          });
-        }
-      });
-
 };  
 
+// LOGO FLIP 
+function navLogoFlip(){ 
+
+  console.log("Running Nav")
+
+  const originalNavContainer = document.querySelector('.logo-container'); // Original container
+  const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
+  const navLogo = document.querySelector('.logo.is-hero');
+
+  gsap.set('.logo.is-nav', {display: 'none'});
+
+  // Capture the initial state
+  const navState = Flip.getState(navLogo);
+
+    // ScrollTrigger setup
+    ScrollTrigger.create({
+      trigger: '[data-nav="trigger"]',
+      start: 'top 80%',
+      end: 'top 20%',
+      markers: false,
+      onEnter: () => {
+        newNavContainer.appendChild(navLogo);
+    
+        Flip.from(navState, {
+          duration: 0.8,
+          scale: true,
+        });
+      },
+      onLeaveBack: () => {
+        const reverseState = Flip.getState(navLogo); 
+    
+        originalNavContainer.appendChild(navLogo);
+    
+        Flip.from(reverseState, {
+          duration: 0.8,
+          scale: true,
+        });
+      }
+    });
+  }
 
 // INTRO
 if (document.querySelector('.section-home_intro')) {
@@ -403,6 +407,7 @@ if (document.querySelector('.section-home_video')) {
   playBtn.addEventListener('click', togglePlay);
   
 
+  // Enter Video section
   const videoSection = gsap.timeline({
     scrollTrigger: {
       trigger: '.section-home_video',
@@ -412,18 +417,13 @@ if (document.querySelector('.section-home_video')) {
       scrub: true,
     }
   });
-  
-  videoSection.to('.page-wrapper', {
-    background: 'rgba(0, 0, 0, 1)',
-    duration: 1,
-    ease: 'power4.inOut'
-  });
-
+  videoSection.to('.page-wrapper', { background: 'rgba(0, 0, 0, 1)', duration: 1,  ease: 'power4.inOut' });
   videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
   videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
   videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
-  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut'},  0.5);
+  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut', onComplete:togglePlay},  0.5);
 
+  // Exit Video section
   const videoSectionOut = gsap.timeline({
     scrollTrigger: {
       trigger: '.section-home_video',
@@ -432,12 +432,12 @@ if (document.querySelector('.section-home_video')) {
       toggleActions: 'play none reverse none'
     }
   });
-  
-  videoSectionOut.to('.home-video_wrapper', {   opacity: 0,   scale: 0.8,   duration: 1,   ease: 'power4.inOut', onComplete: function() {
-    const video = document.getElementById('videomain');
-    if (video) {
-      video.pause(); // Pause the video if it exists
+  videoSectionOut.to('.home-video_wrapper', { opacity: 0, scale: 0.8, duration: 1, ease: 'power4.inOut', onComplete: function() {
+  const video = document.getElementById('videomain');
+    if (!video.paused) { 
+      video.pause();
     }
+    toggleAudio()
   } }, 0); 
   videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
   videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
@@ -485,6 +485,30 @@ if (document.querySelector('.portfolio-grid_wrapper')) {
       toggleActions: "play reverse play reverse",
       
     }
+  })
+
+  const portfolioGridSection = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.portfolio-grid_wrapper',
+      start: 'top 60%',
+      end: "bottom 40%",
+      markers:false,
+    }
+  });
+
+  portfolioGridSection.from('.section-home_portfolio-grid h2', {
+    opacity:0,
+    y:50,
+  })
+
+  const portfolioGridText = new SplitType('.section-home_portfolio-grid p', {types: 'words,chars'});
+  portfolioGridSection.from(portfolioGridText.chars, {
+    opacity:0,
+    y:50,
+    stagger: {
+      amount: 0.5
+    },
+    ease: "power4.inOut",
   })
 }
 
@@ -562,39 +586,62 @@ if (document.querySelector('.swiper')) {
 // Initialize Barba after Swiper setup to ensure first active slide is correctly set
 barba.init({
   transitions: [
-      {
-          name: 'portfolio-transition',
-          sync: true,
-          async enter(data) {
-              data.next.container.classList.add('is-transitioning');
-
-              const currentImg = data.current.container.querySelector('video[data-barba-img]');
-              const newImg = data.next.container.querySelector('.background-img');
-
-              if (!currentImg || !newImg) {
-                  console.error(currentImg);
-                  return;
-              }
-
-              const currentImgParent = currentImg.parentElement;
-              const newImgParent = newImg.parentElement;
-
-              const state = Flip.getState(currentImg);
-
-              currentImgParent.style.height = `${currentImg.offsetHeight}px`;
-
-              newImg.remove();
-              newImgParent.appendChild(currentImg);
-
-              await Flip.from(state, { duration: 1, ease: "power4.inOut" });
-
-              data.next.container.classList.remove('is-transitioning');
-          },
-          async after(data) {
-              window.scrollTo(0, 0);
-              console.log('after portfolio transition');
-          },
+    // Transition for going from homepage to portfolio and back
+    {
+      name: 'portfolio-transition',
+      sync: true,
+      from: {
+        namespace: ['home', 'portfolio'],
       },
+      to: {
+        namespace: ['portfolio', 'home'],
+      },
+      async enter(data) {
+        data.next.container.classList.add('is-transitioning');
+
+        const currentImg = data.current.container.querySelector('video[data-barba-img]');
+        const newImg = data.next.container.querySelector('.background-img');
+
+        if (!currentImg || !newImg) {
+          console.error('Image not found during transition');
+          return;
+        }
+
+        const currentImgParent = currentImg.parentElement;
+        const newImgParent = newImg.parentElement;
+
+        const state = Flip.getState(currentImg);
+
+        currentImgParent.style.height = `${currentImg.offsetHeight}px`;
+
+        newImg.remove();
+        newImgParent.appendChild(currentImg);
+
+        await Flip.from(state, { duration: 1, ease: "power4.inOut" });
+
+        data.next.container.classList.remove('is-transitioning');
+      },
+      async after(data) {
+        window.scrollTo(0, 0);
+        console.log('after portfolio transition');
+      },
+    },
+    // GSAP Fade transition for other pages
+    {
+      name: 'fade-transition',
+      async leave(data) {
+        await gsap.to(data.current.container, { opacity: 0, duration: 0.5, ease: "power2.out" });
+      },
+      async enter(data) {
+        gsap.set(data.next.container, { opacity: 0 });
+        await gsap.to(data.next.container, { opacity: 1, duration: 0.5, ease: "power2.out" });
+
+        // Check if the user is entering the homepage
+        if (data.next.namespace === 'home') {
+          navLogoFlip(); // Run the navLogoFlip() function on the homepage
+        }
+      }
+    }
   ],
 });
 
@@ -613,146 +660,185 @@ document.querySelectorAll('[data-link]').forEach(element => {
 
 // NAVIGATION
 let navbarStatus = false; // Track the status of the navbar
-document.querySelector('#nav-btn').addEventListener('click', function() {
-    // Check the current status of the navbar
+
+function navStatus() {
     if (!navbarStatus) {
         // Open the navbar
-    
 
-        gsap.set('.nav-menu_wrapper', { opacity: 0 });
+        gsap.set('.nav-menu_wrapper', {
+            opacity: 0
+        });
         // gsap.set('.nav-link', { opacity: 0, y: 40 });
 
         const navOpen = gsap.timeline();
+
+        navOpen.to('#Bottom', { y:'-20', duration:0.5 }, 0);
+        navOpen.to('#Top', { y:'20', duration:0.5 }, 0);
+
 
         navOpen.to('.nav-menu_wrapper', {
             display: 'flex',
             opacity: 1,
             duration: 0.5,
             ease: "power4.inOut",
-        }) 
+        })
 
-        navOpen.from('.logo', {
-          opacity:0,
-          duration: 1
-        }, 0)
+        // navOpen.from('.logo', {
+        //   opacity:0,
+        //   duration: 1
+        // }, 0)
 
         navOpen.from('[data-gsap="nav"]', {
-          opacity:0,
-          y:'40',
-          duration: 1,
-          stagger: {
-            amount: 0.25,
-          },
-          ease: "power4.inOut"
+            opacity: 0,
+            y: '40',
+            duration: 1,
+            stagger: {
+                amount: 0.25,
+            },
+            ease: "power4.inOut"
         }, '0')
 
         navOpen.from('.nav-menu_shape-wrapper', {
-          opacity:0,
-          x:'40',
-          duration: 1,
+            opacity: 0,
+            x: '40',
+            duration: 1,
         }, 0)
-        
+
         navOpen.from('.nav-menu_divider', {
-          height:0,
-          duration: 1,
-          ease: "power4.inOut"
+            height: 0,
+            duration: 1,
+            ease: "power4.inOut"
 
         }, 0.2)
 
-
-        
-
-
         navbarStatus = true; // Update the status to open
     } else {
-        
 
-      const navClose = gsap.timeline();
 
-      navClose.to('.nav-menu_divider', {
-        height:0,
-        duration: 1,
-        ease: "power4.inOut"
-      }, 0)
+        const navClose = gsap.timeline();
 
-      navClose.to('.nav-menu_shape-wrapper', {
-        opacity:0,
-        x:'40',
-        duration: 1,
-      }, 0)
-    
-      navClose.to('[data-gsap="nav"]', {
-        opacity:0,
-        y:'40',
-        duration: 1,
-        stagger: {
-          amount: 0.25,
-        },
-        ease: "power4.inOut"
-      }, '0')
+        navClose.to('#Bottom', { y:'0', duration:0.5 }, 0);
+        navClose.to('#Top', { y:'0', duration:0.5 }, 0);
 
-      navClose.to('.logo', {
-        opacity:1,
-        duration: 1
-      }, 0)
-      
-      
-      navClose.to('.nav-menu_wrapper', {
-        opacity: 0,
-        duration: 0.5,
-        ease: "power4.inOut",
-        onComplete: function() {
-          gsap.set('.nav-menu_wrapper', { display: 'none' }); // Hide it after animation
-          gsap.set('.logo', { clearProps: "all"  });
-          gsap.set('[data-gsap="nav"]', { clearProps: "all"  });
-          gsap.set('.nav-menu_divider', { clearProps: "all"  });
-          gsap.set('.nav-menu_shape-wrapper', { clearProps: "all"  });
-      }
-    }) 
-    
+        navClose.to('.nav-menu_divider', {
+            height: 0,
+            duration: 1,
+            ease: "power4.inOut"
+        }, 0)
+
+        navClose.to('.nav-menu_shape-wrapper', {
+            opacity: 0,
+            x: '40',
+            duration: 1,
+        }, 0)
+
+        navClose.to('[data-gsap="nav"]', {
+            opacity: 0,
+            y: '40',
+            duration: 1,
+            stagger: {
+                amount: 0.25,
+            },
+            ease: "power4.inOut"
+        }, '0')
+
+        // navClose.to('.logo', {
+        //   opacity:1,
+        //   duration: 1
+        // }, 0)
+
+
+        navClose.to('.nav-menu_wrapper', {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power4.inOut",
+            onComplete: function () {
+                gsap.set('.nav-menu_wrapper', {
+                    display: 'none'
+                }); // Hide it after animation
+                // gsap.set('.logo', { clearProps: "all"  });
+                gsap.set('[data-gsap="nav"]', {
+                    clearProps: "all"
+                });
+                gsap.set('.nav-menu_divider', {
+                    clearProps: "all"
+                });
+                gsap.set('.nav-menu_shape-wrapper', {
+                    clearProps: "all"
+                });
+            }
+        })
+
 
         navbarStatus = false; // Update the status to closed
     }
-});
+}
 
-gsap.to('.section_portfolio-text', {
-  height:0,
-  duration: 1,
-  scrollTrigger: {
-    trigger: '.section_portfolio-text',
-    start: 'top 70%',
-  }
-}) 
+document.querySelector('#nav-btn').addEventListener('click', function () {
+    navStatus()
+});
 
 
 // NAV LINK HOVER
 const navLinks = document.querySelectorAll('.nav-link'); // Select all nav-link elements
 
 navLinks.forEach(navLink => {
-  const navText = new SplitType(navLink, { types: 'words, chars' }); // Create SplitType instance for each nav link
+    const navText = new SplitType(navLink, {
+        types: 'words, chars'
+    }); // Create SplitType instance for each nav link
 
-  const handleHoverIn = () => {
-    gsap.to(navText.chars, {
-      y: '-100%',
-      duration: 1,
-      stagger: {
-        amount: 0.5
-      },
-      ease: "power4.inOut",
-    });
-  };
+    const handleHoverIn = () => {
+        gsap.to(navText.chars, {
+            y: '-100%',
+            duration: 1,
+            stagger: {
+                amount: 0.5
+            },
+            ease: "power4.inOut",
+        });
+    };
 
-  const handleHoverOut = () => {
-    gsap.to(navText.chars, {
-      y: '0%',
-      duration: 1,
-      stagger: {
-        amount: 0.5
-      },
-      ease: "power4.inOut",
-    });
-  };
+    const handleHoverOut = () => {
+        gsap.to(navText.chars, {
+            y: '0%',
+            duration: 1,
+            stagger: {
+                amount: 0.5
+            },
+            ease: "power4.inOut",
+        });
+    };
 
-  navLink.addEventListener('mouseenter', handleHoverIn);
-  navLink.addEventListener('mouseleave', handleHoverOut);
+    navLink.addEventListener('mouseenter', handleHoverIn);
+    navLink.addEventListener('mouseleave', handleHoverOut);
 });
+
+// close nav on click
+navLinks.forEach(link => {
+  link.addEventListener('click', function() {
+      navStatus();
+  });
+});
+
+
+
+// HOMEPAGE
+
+// Function to check if the user is on the homepage
+function isHomePage() {
+  // Get the current URL
+  const currentUrl = window.location.href;
+
+  // Define the homepage URL (update this as necessary)
+  const homePageUrl = window.location.origin + '/'; // Adjust if your homepage URL is different
+
+  // Check if the current URL matches the homepage URL
+  return currentUrl === homePageUrl;
+}
+
+// Run navLogoFlip if on the homepage
+if (isHomePage()) {
+  navLogoFlip();
+}
+
+
