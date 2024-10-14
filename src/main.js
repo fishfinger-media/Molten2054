@@ -223,7 +223,7 @@ if (document.querySelector('.section-home_intro')) {
       scrollTrigger: {
         trigger: '.section-home_intro',
         start: 'top 20%',
-        markers: true,
+        markers: false,
         toggleActions: 'play none none reset'
       }
     })
