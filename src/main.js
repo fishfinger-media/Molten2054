@@ -18,9 +18,11 @@ function raf(time) {
 }
 requestAnimationFrame(raf)
 
+
+
 // LOAD MUSIC
 var audio = new Audio();
-audio.src = 'https://s3.amazonaws.com/audio.mp3land.com/mp3/2019/01/07/mp3-2019-01-07-00-00-00.mp3';
+audio.src = 'https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3';
 
 
 function toggleAudio() {
@@ -147,22 +149,28 @@ if (document.querySelector('.section-home_hero')) {
     }
   });
   
-  heroExit.to('[data-load="text"]', {
+  heroExit.to('.hero-earth_circle', {
     rotate: 90,
     y: 2000,
-    scale: 1.5,
+    scale: 2,
+    pointerEvents: 'none',
     opacity: 0,
     duration: 1,
-  });
+  } );
   
-  heroExit.to('.home_hero-earth_container', {
+  heroExit.to('.hero-earth_content', {
     rotate: 90,
     y: 2000,
-    scale: 1.5,
+    scale: 2,
     pointerEvents: 'none',
     opacity: 0,
     duration: 1,
   }, 0);
+
+  heroExit.to('.earth-content', {
+    rotate: '-90',
+    duration:1,
+  },0)
 
   // nav logo gsap flip 
 
@@ -274,6 +282,7 @@ if (document.querySelector('.section-home_video')) {
 
     playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
     video[method]();
+    toggleAudio()
   }
 
   // TOGGLE SOUND
@@ -419,8 +428,13 @@ if (document.querySelector('.section-home_video')) {
       toggleActions: 'play none reverse none'
     }
   });
-
-  videoSectionOut.to('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0);
+  
+  videoSectionOut.to('.home-video_wrapper', {   opacity: 0,   scale: 0.8,   duration: 1,   ease: 'power4.inOut', onComplete: function() {
+    const video = document.getElementById('videomain');
+    if (video) {
+      video.pause(); // Pause the video if it exists
+    }
+  } }, 0); 
   videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
   videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
   videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
@@ -568,7 +582,7 @@ barba.init({
               newImg.remove();
               newImgParent.appendChild(currentImg);
 
-              await Flip.from(state, { duration: 0.5 });
+              await Flip.from(state, { duration: 1, ease: "power4.inOut" });
 
               data.next.container.classList.remove('is-transitioning');
           },
