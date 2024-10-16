@@ -18,10 +18,12 @@ function raf(time) {
 }
 requestAnimationFrame(raf)
 
+lenis.stop(); 
 
 // LOAD MUSIC
 var audio = new Audio();
 audio.src = 'https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3';
+var AudioPlaying = false;
 
 
 function toggleAudio() {
@@ -32,105 +34,66 @@ function toggleAudio() {
   }
 }
 
+window.scrollTo(0, 0);
+
+
+
+// LOADER
+
+document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+  loadPage()
+})
+
+
+function loadPage() {
+
+  const loader = gsap.timeline();
+
+  loader.to('[data-gsap="enter"]', {opacity:0, duration: 1, pointerEvents:'none' });
+  loader.to('.loader-text_first', {opacity:0, duration: 2, }, 0);
+  loader.to('.loader-text_main', {opacity:1, duration: 2, }, 0);
+
+  loader.to('.hero_background-circle_wrapper', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
+  loader.to('.hero_background-content ', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
+  loader.to('.elements-img', {opacity:0, duration: 1.5, ease: "power4.inOut" }, 0);
+  loader.to('.loader-shadow', { opacity:0.3, duration: 1, ease: "power4.inOut" }, 0);
+
+  const originalContainer = document.querySelector('.elements-container');
+  const newContainer = document.querySelector('.earth-wrapper');
+  const img = document.querySelector('.elements-wrapper');
+
+  const state = Flip.getState(img);
+
+  newContainer.appendChild(img);
+  
+  Flip.from(state, {
+      duration: 1.5,
+      ease: "power1.inOut",
+      scale: true
+  });
+
+  lenis.start();
+
+  toggleAudio()
+  AudioPlaying = true;
+
+}
+
+
 document.querySelectorAll('.nav-bar_link.is-music').forEach(element => {
   element.addEventListener('click', function() {
+    
+    if (AudioPlaying) {
+      AudioPlaying = false;
+    } else {
+      AudioPlaying = true;
+    }
+    
     toggleAudio();
   });
 });
 
 
-// NOISE
-if (document.querySelector("#noise")) {
-    const noise = () => {
-      let canvas, ctx;
-    
-      let wWidth, wHeight;
-    
-      let noiseData = [];
-      let frame = 0;
-    
-      let loopTimeout;
-    
-    
-      // Create Noise
-      const createNoise = () => {
-          const idata = ctx.createImageData(wWidth, wHeight);
-          const buffer32 = new Uint32Array(idata.data.buffer);
-          const len = buffer32.length;
-    
-          for (let i = 0; i < len; i++) {
-              if (Math.random() < 0.5) {
-                  buffer32[i] = 0xff000000;
-              }
-          }
-    
-          noiseData.push(idata);
-      };
-    
-    
-      // Play Noise
-      const paintNoise = () => {
-          if (frame === 9) {
-              frame = 0;
-          } else {
-              frame++;
-          }
-    
-          ctx.putImageData(noiseData[frame], 0, 0);
-      };
-    
-    
-      // Loop
-      const loop = () => {
-          paintNoise(frame);
-    
-          loopTimeout = window.setTimeout(() => {
-              window.requestAnimationFrame(loop);
-          }, (3000 / 25));
-      };
-    
-    
-      // Setup
-      const setup = () => {
-          wWidth = window.innerWidth;
-          wHeight = window.innerHeight;
-    
-          canvas.width = wWidth;
-          canvas.height = wHeight;
-    
-          for (let i = 0; i < 10; i++) {
-              createNoise();
-          }
-    
-          loop();
-      };
-    
-    
-      // Reset
-      let resizeThrottle;
-      const reset = () => {
-          window.addEventListener('resize', () => {
-              window.clearTimeout(resizeThrottle);
-    
-              resizeThrottle = window.setTimeout(() => {
-                  window.clearTimeout(loopTimeout);
-                  setup();
-              }, 100);
-          }, false);
-      };
-    
-    
-      // Init
-      const init = (() => {
-          canvas = document.getElementById('noise');
-          ctx = canvas.getContext('2d');
-    
-          setup();
-      })();
-    };
-    noise();
-    
-};
     
 
 // HERO
@@ -148,17 +111,16 @@ if (document.querySelector('.section-home_hero')) {
     }
   });
   
-  heroExit.to('[data-gsap="hero-earth-circle"]', {
+  heroExit.to('.hero_background-circle_wrapper', {
     rotate: 90,
     y: 2000,
-    scale: 2,
+    scale: 2.5,
     pointerEvents: 'none',
     opacity: 0,
     duration: 1,
   } );
   
-  heroExit.to('.hero-earth_content', {
-    rotate: 90,
+  heroExit.to('.hero_background-earth', {
     y: 2000,
     scale: 2,
     pointerEvents: 'none',
@@ -166,25 +128,21 @@ if (document.querySelector('.section-home_hero')) {
     duration: 1,
   }, 0);
 
-  heroExit.to('.earth-content', {
-    rotate: '-90',
-    duration:1,
-  },0)
-
-  heroExit.to('[data-load="text"]', {
+  heroExit.to('.loader-text_wrapper', {
     opacity:0,
+    duration: 0.2,
   },0)
-
-  // nav logo gsap flip 
 
 };  
+
+
 
 // LOGO FLIP 
 function navLogoFlip(){ 
 
   console.log("Running Nav")
 
-  const originalNavContainer = document.querySelector('.logo-container'); // Original container
+  const originalNavContainer = document.querySelector('.logo-wrapper'); // Original container
   const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
   const navLogo = document.querySelector('.logo.is-hero');
 
@@ -244,8 +202,6 @@ if (document.querySelector('.section-home_intro')) {
       }
     })
 
-   
-
     const paragraph = new SplitType('[gsap-heading]', { types: 'words, chars' });
 
     introSection.from(paragraph.chars, {
@@ -277,6 +233,7 @@ if (document.querySelector('.section-home_intro')) {
 
 
 // VIDEO SECTION
+
 if (document.querySelector('.section-home_video')) {
   
   const video = document.getElementById('videomain');
@@ -290,8 +247,19 @@ if (document.querySelector('.section-home_video')) {
 
     playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
     video[method]();
-    toggleAudio()
+   
   }
+
+
+  function toggleAudioPlayVideo() {
+    if (AudioPlaying === true) {
+        audio.pause();
+    }
+    togglePlay(); 
+}
+  
+
+
 
   // TOGGLE SOUND
   function toggleSound() {
@@ -417,11 +385,14 @@ if (document.querySelector('.section-home_video')) {
       scrub: true,
     }
   });
+
   videoSection.to('.page-wrapper', { background: 'rgba(0, 0, 0, 1)', duration: 1,  ease: 'power4.inOut' });
   videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
   videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
   videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
-  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut', onComplete:togglePlay},  0.5);
+  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut', onComplete:toggleAudioPlayVideo},  0.5);
+
+
 
   // Exit Video section
   const videoSectionOut = gsap.timeline({
@@ -432,13 +403,19 @@ if (document.querySelector('.section-home_video')) {
       toggleActions: 'play none reverse none'
     }
   });
+
   videoSectionOut.to('.home-video_wrapper', { opacity: 0, scale: 0.8, duration: 1, ease: 'power4.inOut', onComplete: function() {
   const video = document.getElementById('videomain');
     if (!video.paused) { 
       video.pause();
+
+      if (AudioPlaying === true) {
+        audio.play();
+      }
     }
-    toggleAudio()
+    
   } }, 0); 
+
   videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
   videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
   videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
@@ -519,6 +496,7 @@ if (document.querySelector('.swiper')) {
     modules: [Navigation], 
     centeredSlides: true,
     slidesPerView: 'auto',
+    speed: 900,
     spaceBetween: '0',
     loop: true,
     
@@ -542,8 +520,8 @@ if (document.querySelector('.swiper')) {
 
   swiper.on('slideChangeTransitionStart', () => {
     // Your existing slide change logic
-    gsap.to('.swiper-slide-active', { scale: 1, duration: 0.5, ease: "power4.inOut" });
-    gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.5, ease: "power4.inOut" });
+    gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
+    gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.8, ease: "power4.inOut" });
 
     const activeSlide = document.querySelector('.swiper-slide-active');
     const companyName = activeSlide.getAttribute('data-company');
