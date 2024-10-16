@@ -1,4 +1,3 @@
-
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,147 +10,194 @@ import SplitType from "split-type";
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 
-const lenis = new Lenis()
+// LENIS
+const lenis = new Lenis();
 function raf(time) {
-  lenis.raf(time)
-  requestAnimationFrame(raf)
+  lenis.raf(time);
+  requestAnimationFrame(raf);
 }
-requestAnimationFrame(raf)
-
-lenis.stop(); 
-
-// LOAD MUSIC
-var audio = new Audio();
-audio.src = 'https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3';
-var AudioPlaying = false;
+requestAnimationFrame(raf);
 
 
-function toggleAudio() {
-  if (audio.paused) {
-    audio.play();
-  } else {
-    audio.pause();
-  }
-}
+// GLOBAL CODE
 
-window.scrollTo(0, 0);
+    // AUDIO
+      // Load Music
+      var audio = new Audio();
+      audio.src = 'https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3';
+      var AudioPlaying = false;
+      document.getElementById('off-txt').style.opacity = 0.5;
 
+      function toggleAudio() {
+        if (audio.paused) {
+          audio.play();
+          document.getElementById('off-txt').style.opacity = 0.5;
+          document.getElementById('on-txt').style.opacity = 1;
 
+        } else {
+          audio.pause();
+          document.getElementById('off-txt').style.opacity = 1;
+          document.getElementById('on-txt').style.opacity = 0.5;
 
-// LOADER
+        }
+      }
 
-document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
-  loadPage()
-})
+      // Music Button
+      document.querySelectorAll('.nav-bar_link.is-music').forEach(element => {
+        element.addEventListener('click', function() {
+          AudioPlaying = !AudioPlaying;
+          toggleAudio();
+        });
+      });
 
+      function navigationJS() {
+        let navbarStatus = false;
 
-function loadPage() {
+        function navStatus() {
+          if (!navbarStatus) {
+            gsap.set('.nav-menu_wrapper', { opacity: 0 });
+            const navOpen = gsap.timeline();
+            navOpen.to('#Bottom', { y:'-20', duration:0.5 }, 0);
+            navOpen.to('#Top', { y:'20', duration:0.5 }, 0);
+            navOpen.to('.nav-menu_wrapper', { display: 'flex', opacity: 1, duration: 0.5, ease: "power4.inOut" });
+            navOpen.from('[data-gsap="nav"]', { opacity: 0, y: '40', duration: 1, stagger: { amount: 0.25 }, ease: "power4.inOut" }, '0');
+            navOpen.from('.nav-menu_shape-wrapper', { opacity: 0, x: '40', duration: 1 }, 0);
+            navOpen.from('.nav-menu_divider', { height: 0, duration: 1, ease: "power4.inOut" }, 0.2);
+            navbarStatus = true;
+          } else {
+            const navClose = gsap.timeline();
+            navClose.to('#Bottom', { y:'0', duration:0.5 }, 0);
+            navClose.to('#Top', { y:'0', duration:0.5 }, 0);
+            navClose.to('.nav-menu_divider', { height: 0, duration: 1, ease: "power4.inOut" }, 0);
+            navClose.to('.nav-menu_shape-wrapper', { opacity: 0, x: '40', duration: 1 }, 0);
+            navClose.to('[data-gsap="nav"]', { opacity: 0, y: '40', duration: 1, stagger: { amount: 0.25 }, ease: "power4.inOut" }, '0');
+            navClose.to('.nav-menu_wrapper', { opacity: 0, duration: 0.5, ease: "power4.inOut", onComplete: () => {
+              gsap.set('.nav-menu_wrapper', { display: 'none' });
+              gsap.set('[data-gsap="nav"]', { clearProps: "all" });
+              gsap.set('.nav-menu_divider', { clearProps: "all" });
+              gsap.set('.nav-menu_shape-wrapper', { clearProps: "all" });
+            }});
+            navbarStatus = false;
+          }
+        }
 
-  const loader = gsap.timeline();
+        document.querySelector('#nav-btn').addEventListener('click', function () {
+        navStatus();
+        });
 
-  loader.to('[data-gsap="enter"]', {opacity:0, duration: 1, pointerEvents:'none' });
-  loader.to('.loader-text_first', {opacity:0, duration: 2, }, 0);
-  loader.to('.loader-text_main', {opacity:1, duration: 2, }, 0);
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(navLink => {
+        const navText = new SplitType(navLink, { types: 'words, chars' });
+        const handleHoverIn = () => {
+          gsap.to(navText.chars, { y: '-100%', duration: 1, stagger: { amount: 0.5 }, ease: "power4.inOut" });
+        };
+        const handleHoverOut = () => {
+          gsap.to(navText.chars, { y: '0%', duration: 1, stagger: { amount: 0.5 }, ease: "power4.inOut" });
+        };
+        navLink.addEventListener('mouseenter', handleHoverIn);
+        navLink.addEventListener('mouseleave', handleHoverOut);
+        });
 
-  loader.to('.hero_background-circle_wrapper', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
-  loader.to('.hero_background-content ', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
-  loader.to('.elements-img', {opacity:0, duration: 1.5, ease: "power4.inOut" }, 0);
-  loader.to('.loader-shadow', { opacity:0.3, duration: 1, ease: "power4.inOut" }, 0);
-
-  const originalContainer = document.querySelector('.elements-container');
-  const newContainer = document.querySelector('.earth-wrapper');
-  const img = document.querySelector('.elements-wrapper');
-
-  const state = Flip.getState(img);
-
-  newContainer.appendChild(img);
+        navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          navStatus();
+        });
+        });
+      }
   
-  Flip.from(state, {
-      duration: 1.5,
-      ease: "power1.inOut",
-      scale: true
-  });
-
-  lenis.start();
-
-  toggleAudio()
-  AudioPlaying = true;
-
-}
+      navigationJS()
 
 
-document.querySelectorAll('.nav-bar_link.is-music').forEach(element => {
-  element.addEventListener('click', function() {
+// HOMEPAGE JS
+function homepageJs() { 
+
+  // Homepage Loader
+  function homepageLoader() {
+
+    lenis.stop();
+
+    gsap.set('.footer', {opacity:0})
+    gsap.set('.navigation', {opacity:0})
+
+    function loadPage() {
+
+      const loader = gsap.timeline();
+      loader.to('[data-gsap="enter"]', {opacity:0, duration: 1, pointerEvents:'none' });
+      loader.to('.loader-text_first', {opacity:0, duration: 2}, 0);
+      loader.to('.loader-text_main', {opacity:1, duration: 2}, 0);
+      loader.to('.hero_background-circle_wrapper', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
+      loader.to('.hero_background-content ', { opacity:1, duration: 1.5, ease: "power4.inOut" }, 0);
+      loader.to('.elements-img', {opacity:0, duration: 1.5, ease: "power4.inOut" }, 0);
+      loader.to('.loader-shadow', { opacity:0.3, duration: 1, ease: "power4.inOut" }, 0);
+      loader.to('.footer', {opacity:1, duration: 1, ease: "power4.inOut" }, 0);
+      loader.to('.navigation',{ opacity:1, duration: 1, ease: "power4.inOut" }, 0);
+      const originalContainer = document.querySelector('.elements-container');
+      const newContainer = document.querySelector('.earth-wrapper');
+      const img = document.querySelector('.elements-wrapper');
+      const state = Flip.getState(img);
     
-    if (AudioPlaying) {
-      AudioPlaying = false;
-    } else {
+      newContainer.appendChild(img);
+      Flip.from(state, {
+        duration: 1.5,
+        ease: "power1.inOut",
+        scale: true
+      });
+    
+      lenis.start();
+      toggleAudio();
       AudioPlaying = true;
+
     }
-    
-    toggleAudio();
-  });
-});
 
+    document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+      loadPage();
+    });
 
-    
+  }
 
-// HERO
-if (document.querySelector('.section-home_hero')) {
-
-  // Scroll Exit
-  const heroExit = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.section-home_hero',
-      start: 'bottom 95%',
-      end: 'bottom 10%',
-      scrub: true,
-      markers: false,
+  // Homepage Hero
+  if (document.querySelector('.section-home_hero')) {
+    const heroExit = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_hero',
+        start: 'bottom 95%',
+        end: 'bottom 10%',
+        scrub: true,
+        markers: false,
+      }
+    });
   
-    }
-  });
+    heroExit.to('.hero_background-circle_wrapper', {
+      rotate: 90,
+      y: 2000,
+      scale: 2.5,
+      pointerEvents: 'none',
+      opacity: 0,
+      duration: 1,
+    });
   
-  heroExit.to('.hero_background-circle_wrapper', {
-    rotate: 90,
-    y: 2000,
-    scale: 2.5,
-    pointerEvents: 'none',
-    opacity: 0,
-    duration: 1,
-  } );
+    heroExit.to('.hero_background-earth', {
+      y: 2000,
+      scale: 2,
+      pointerEvents: 'none',
+      opacity: 0,
+      duration: 1,
+    }, 0);
   
-  heroExit.to('.hero_background-earth', {
-    y: 2000,
-    scale: 2,
-    pointerEvents: 'none',
-    opacity: 0,
-    duration: 1,
-  }, 0);
+    heroExit.to('.loader-text_wrapper', {
+      opacity: 0,
+      duration: 0.2,
+    }, 0);
+  }
 
-  heroExit.to('.loader-text_wrapper', {
-    opacity:0,
-    duration: 0.2,
-  },0)
+  // Hero Logo Flip
+  function navLogoFlip() {
+    const originalNavContainer = document.querySelector('.logo-wrapper');
+    const newNavContainer = document.querySelector('.nav-bar_logo-container');
+    const navLogo = document.querySelector('.logo.is-hero');
+    gsap.set('.logo.is-nav', {display: 'none'});
 
-};  
-
-
-
-// LOGO FLIP 
-function navLogoFlip(){ 
-
-  console.log("Running Nav")
-
-  const originalNavContainer = document.querySelector('.logo-wrapper'); // Original container
-  const newNavContainer = document.querySelector('.nav-bar_logo-container'); // New container
-  const navLogo = document.querySelector('.logo.is-hero');
-
-  gsap.set('.logo.is-nav', {display: 'none'});
-
-  // Capture the initial state
-  const navState = Flip.getState(navLogo);
-
-    // ScrollTrigger setup
+    const navState = Flip.getState(navLogo);
     ScrollTrigger.create({
       trigger: '[data-nav="trigger"]',
       start: 'top 80%',
@@ -159,40 +205,30 @@ function navLogoFlip(){
       markers: false,
       onEnter: () => {
         newNavContainer.appendChild(navLogo);
-    
-        Flip.from(navState, {
-          duration: 0.8,
-          scale: true,
-        });
+        Flip.from(navState, { duration: 0.8, scale: true });
       },
       onLeaveBack: () => {
-        const reverseState = Flip.getState(navLogo); 
-    
+        const reverseState = Flip.getState(navLogo);
         originalNavContainer.appendChild(navLogo);
-    
-        Flip.from(reverseState, {
-          duration: 0.8,
-          scale: true,
-        });
+        Flip.from(reverseState, { duration: 0.8, scale: true });
       }
     });
   }
 
-// INTRO
-if (document.querySelector('.section-home_intro')) {
-
-  gsap.from('.lines', {
-    height: 0,
-    duration: 2,
-    ease: "power4.inOut",  
-    scrollTrigger: {
-      trigger: '.section-home_intro',
-      start: 'top 60%',
-      markers: false,
-      toggleActions: 'play none reverse none'
-    }
-  })
-
+  // Homepage Intro Section
+  if (document.querySelector('.section-home_intro')) {
+    gsap.from('.lines', {
+      height: 0,
+      duration: 2,
+      ease: "power4.inOut",  
+      scrollTrigger: {
+        trigger: '.section-home_intro',
+        start: 'top 60%',
+        markers: false,
+        toggleActions: 'play none reverse none'
+      }
+    });
+  
     const introSection = gsap.timeline({
       scrollTrigger: {
         trigger: '.section-home_intro',
@@ -200,623 +236,331 @@ if (document.querySelector('.section-home_intro')) {
         markers: false,
         toggleActions: 'play none none reset'
       }
-    })
-
+    });
+  
     const paragraph = new SplitType('[gsap-heading]', { types: 'words, chars' });
-
+  
     introSection.from(paragraph.chars, {
       opacity: 0,
       y: 20,
       duration: 0.5,
-      stagger: {
-        amount: 0.5
-      },
+      stagger: { amount: 0.5 },
       ease: "sine.inOut",
     });
-
+  
     introSection.from('.section-home_intro h2', {
       opacity: 0,
       y: 50,
       duration: 1,
       ease: "sine.inOut",
     }, 0);
-   
-   
+  
     introSection.from('[data-gsap="section-btn"]', {
       opacity: 0,
       y: 50,
       duration: 1,
       ease: "sine.inOut",
     }, 0);
-    
-};
-
-
-// VIDEO SECTION
-
-if (document.querySelector('.section-home_video')) {
-  
-  const video = document.getElementById('videomain');
-  const timelineWrapper = document.querySelector('.timeline-wrapper');
-  const soundButton = document.querySelector('[toggle-volume]');
-  const playBtn = document.querySelector('[toggle-play]');
-
-  // TOGGLE VIDEO
-  function togglePlay() {
-    const method = video.paused ? 'play' : 'pause';
-
-    playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
-    video[method]();
-   
   }
 
-
-  function toggleAudioPlayVideo() {
-    if (AudioPlaying === true) {
-        audio.pause();
-    }
-    togglePlay(); 
-}
-  
-
-
-
-  // TOGGLE SOUND
-  function toggleSound() {
+  // Homepage Video Section
+  if (document.querySelector('.section-home_video')) {
+    const video = document.getElementById('videomain');
+    const timelineWrapper = document.querySelector('.timeline-wrapper');
     const soundButton = document.querySelector('[toggle-volume]');
-    video.muted = !video.muted; // Toggle the muted state
-    soundButton.innerText = video.muted ? 'Sound On' : 'Sound Off'; // Update button text
-  }
-
-  // VIDEO PLAYER CONTROLS
-  function videoPlayer() {
-
-    const tickers = document.querySelectorAll('.ticker');
-
-    function handleMouseMove(event) {
-      const rect = timelineWrapper.getBoundingClientRect();
-      const mouseX = event.clientX;
-
-      tickers.forEach((ticker) => {
-        const tickerRect = ticker.getBoundingClientRect();
-        const tickerCenter = tickerRect.left + tickerRect.width;
-        const distance = Math.abs(mouseX - tickerCenter);
-
-        let scaleY;
-        if (distance < 10) {
-          scaleY = 2;
-        } else if (distance < 20) {
-          scaleY = 1.5;
-        } else if (distance < 30) {
-          scaleY = 1.2;
-        } else if (distance < 40) {
-          scaleY = 1.1;
-        } else {
-          scaleY = 1;
-        }
-
-        gsap.to(ticker, {
-          scaleY: scaleY,
-          duration: 0.5,
-          transformOrigin: "bottom"
-        });
-      });
-    }
-
-    function resetTickers() {
-      tickers.forEach((ticker) => {
-        gsap.to(ticker, {
-          scaleY: 1,
-          duration: 0.5,
-          transformOrigin: "bottom"
-        });
-      });
-    }
-
-    timelineWrapper.addEventListener('mousemove', handleMouseMove);
-    timelineWrapper.addEventListener('mouseleave', resetTickers);
-
-    // UPDATE TIMELINE PROGRESS
-    video.addEventListener('timeupdate', () => {
-      const duration = video.duration;
-      const currentTime = video.currentTime;
-
-      const progress = currentTime / duration;
-      const tickersToHighlight = Math.floor(progress * tickers.length);
-
-      tickers.forEach((ticker, index) => {
-        if (index < tickersToHighlight) {
-          ticker.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-        } else {
-          ticker.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-        }
-      });
-    });
-
-    // SCRUB TIMELINE
-    timelineWrapper.addEventListener('click', (event) => {
-      const rect = timelineWrapper.getBoundingClientRect();
-      const clickPosition = event.clientX - rect.left; // Position of the click on the timeline
-      const timelineWidth = rect.width; // Total width of the timeline
-
-      const clickPercentage = clickPosition / timelineWidth; // Percentage of the timeline that was clicked
-      const newTime = clickPercentage * video.duration; // Map click to video duration
-
-      video.currentTime = newTime; // Set video time to the clicked position
-    });
-  }
-
-  //VIDEO TIMELINE GENERATOR
-  function tickerGenerator() {
-    // Get the width of the container
-    const containerWidth = timelineWrapper.offsetWidth; // assuming 'timelineWrapper' is your container
-
-    // Calculate how many tickers can fit (each ticker is 1px wide with a 10px gap)
-    const tickerWidth = 1;
-    const gap = 8;
-    const totalTickerSpace = tickerWidth + gap;
-
-    // Calculate the number of tickers that can fit in the container
-    const numberOfTickers = Math.floor(containerWidth / totalTickerSpace);
-
-    // CREATE TICKERS dynamically
-    for (let i = 1; i <= numberOfTickers; i++) {
-      const ticker = document.createElement('div');
-      ticker.classList.add('ticker');
-      timelineWrapper.appendChild(ticker);
-    }
-
-    videoPlayer()
-  }
-
-  setTimeout(tickerGenerator, 1000)
-  soundButton.addEventListener('click', toggleSound);
-  video.addEventListener('click', togglePlay);
-  playBtn.addEventListener('click', togglePlay);
+    const playBtn = document.querySelector('[toggle-play]');
   
-
-  // Enter Video section
-  const videoSection = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.section-home_video',
-      start: 'top 80%',
-      end: 'top -50%',
-      markers: false,
-      scrub: true,
+    function togglePlay() {
+      const method = video.paused ? 'play' : 'pause';
+      playBtn.innerText = method === 'play' ? 'Pause' : 'Play';
+      video[method]();
     }
-  });
-
-  videoSection.to('.page-wrapper', { background: 'rgba(0, 0, 0, 1)', duration: 1,  ease: 'power4.inOut' });
-  videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
-  videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
-  videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8,duration: 1, ease: 'power4.inOut'}, 0.5);
-  videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut', onComplete:toggleAudioPlayVideo},  0.5);
-
-
-
-  // Exit Video section
-  const videoSectionOut = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.section-home_video',
-      start: 'bottom 90%',
-      markers: false,
-      toggleActions: 'play none reverse none'
-    }
-  });
-
-  videoSectionOut.to('.home-video_wrapper', { opacity: 0, scale: 0.8, duration: 1, ease: 'power4.inOut', onComplete: function() {
-  const video = document.getElementById('videomain');
-    if (!video.paused) { 
-      video.pause();
-
+  
+    function toggleAudioPlayVideo() {
       if (AudioPlaying === true) {
-        audio.play();
+        audio.pause();
       }
+      togglePlay();
     }
-    
-  } }, 0); 
-
-  videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
-  videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
-  videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
-
-}
-
-
-// PORTFOLIO GRID
-if (document.querySelector('.portfolio-grid_wrapper')) {
-  const portfolioGridWrapper = document.querySelector('.portfolio-grid_wrapper');
-  const portfolioGrid = document.querySelector('.portfolio-grid');
   
-  portfolioGridWrapper.addEventListener('mousemove', (e) => {
+    function toggleSound() {
+      video.muted = !video.muted;
+      soundButton.innerText = video.muted ? 'Sound On' : 'Sound Off';
+    }
+  
+    function videoPlayer() {
+      const tickers = document.querySelectorAll('.ticker');
+  
+      function handleMouseMove(event) {
+        const rect = timelineWrapper.getBoundingClientRect();
+        const mouseX = event.clientX;
+  
+        tickers.forEach((ticker) => {
+          const tickerRect = ticker.getBoundingClientRect();
+          const tickerCenter = tickerRect.left + tickerRect.width;
+          const distance = Math.abs(mouseX - tickerCenter);
+  
+          let scaleY;
+          if (distance < 10) scaleY = 2;
+          else if (distance < 20) scaleY = 1.5;
+          else if (distance < 30) scaleY = 1.2;
+          else if (distance < 40) scaleY = 1.1;
+          else scaleY = 1;
+  
+          gsap.to(ticker, {
+            scaleY: scaleY,
+            duration: 0.5,
+            transformOrigin: "bottom"
+          });
+        });
+      }
+  
+      function resetTickers() {
+        tickers.forEach((ticker) => {
+          gsap.to(ticker, { scaleY: 1, duration: 0.5, transformOrigin: "bottom" });
+        });
+      }
+  
+      timelineWrapper.addEventListener('mousemove', handleMouseMove);
+      timelineWrapper.addEventListener('mouseleave', resetTickers);
+  
+      video.addEventListener('timeupdate', () => {
+        const progress = video.currentTime / video.duration;
+        const tickersToHighlight = Math.floor(progress * tickers.length);
+  
+        tickers.forEach((ticker, index) => {
+          ticker.style.backgroundColor = index < tickersToHighlight ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.3)';
+        });
+      });
+  
+      timelineWrapper.addEventListener('click', (event) => {
+        const rect = timelineWrapper.getBoundingClientRect();
+        const clickPosition = event.clientX - rect.left;
+        const clickPercentage = clickPosition / rect.width;
+        video.currentTime = clickPercentage * video.duration;
+      });
+    }
+  
+    function tickerGenerator() {
+      const containerWidth = timelineWrapper.offsetWidth;
+      const totalTickerSpace = 1 + 8;
+      const numberOfTickers = Math.floor(containerWidth / totalTickerSpace);
+  
+      for (let i = 1; i <= numberOfTickers; i++) {
+        const ticker = document.createElement('div');
+        ticker.classList.add('ticker');
+        timelineWrapper.appendChild(ticker);
+      }
+  
+      videoPlayer();
+    }
+  
+    setTimeout(tickerGenerator, 1000);
+    soundButton.addEventListener('click', toggleSound);
+    video.addEventListener('click', togglePlay);
+    playBtn.addEventListener('click', togglePlay);
+  
+    const videoSection = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_video',
+        start: 'top 80%',
+        end: 'top -50%',
+        markers: false,
+        scrub: true,
+      }
+    });
+  
+    videoSection.to('.page-wrapper', { background: 'rgba(0, 0, 0, 1)', duration: 1, ease: 'power4.inOut' });
+    videoSection.to('.navigation', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
+    videoSection.to('.footer', { opacity:0, duration: 1, ease: 'power4.inOut'}, 0);
+    videoSection.from('.home-video_wrapper', { opacity:0, scale:0.8, duration: 1, ease: 'power4.inOut'}, 0.5);
+    videoSection.from('.player-control_wrapper', { opacity:0, y:50, duration: 1, ease: 'power4.inOut', onComplete:toggleAudioPlayVideo},  0.5);
+  
+    const videoSectionOut = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_video',
+        start: 'bottom 90%',
+        markers: false,
+        toggleActions: 'play none reverse none'
+      }
+    });
+  
+    videoSectionOut.to('.home-video_wrapper', { opacity: 0, scale: 0.8, duration: 1, ease: 'power4.inOut', onComplete: function() {
+      if (!video.paused) video.pause();
+      if (AudioPlaying === true) audio.play();
+    }}, 0);
+    videoSectionOut.to('.navigation', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0.5);
+    videoSectionOut.to('.footer', { opacity:1, duration: 1, ease: 'power4.inOut'}, 0);
+    videoSectionOut.to('.page-wrapper', { background: 'rgba(0, 0, 0, 0)', duration: 1, ease: 'power4.inOut'}, 0.5);
+  }
+  
+  // Homepage Portfolio Grid Section
+  if (document.querySelector('.portfolio-grid_wrapper')) {
+    const portfolioGridWrapper = document.querySelector('.portfolio-grid_wrapper');
+    const portfolioGrid = document.querySelector('.portfolio-grid');
+    
+    portfolioGridWrapper.addEventListener('mousemove', (e) => {
       const rect = portfolioGridWrapper.getBoundingClientRect();
-      
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-  
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-  
-      const offsetX = (mouseX - centerX) * 0.05; 
-      const offsetY = (mouseY - centerY) * 0.05; 
-  
-   
-      gsap.to(portfolioGrid, {
-          x: offsetX,
-          y: offsetY,
-          duration: 3,
-          ease: "sine" 
-      });
-  });
-
-  gsap.from('.portfolio-grid_wrapper', {
-    opacity:0,
-    scale:0.8,
-    duration:1.5,
-    ease: CustomEase.create("custom", "M0,0 C0,0.05 0.25,1 1,1 "),
-    scrollTrigger: {
-      trigger: '.portfolio-grid_wrapper',
-      start: 'top 60%',
-      end: "bottom 40%",
-      markers:false,
-      toggleActions: "play reverse play reverse",
+      const offsetX = (mouseX - centerX) * 0.05;
+      const offsetY = (mouseY - centerY) * 0.05;
       
-    }
-  })
-
-  const portfolioGridSection = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.portfolio-grid_wrapper',
-      start: 'top 60%',
-      end: "bottom 40%",
-      markers:false,
-    }
-  });
-
-  portfolioGridSection.from('.section-home_portfolio-grid h2', {
-    opacity:0,
-    y:50,
-  })
-
-  const portfolioGridText = new SplitType('.section-home_portfolio-grid p', {types: 'words,chars'});
-  portfolioGridSection.from(portfolioGridText.chars, {
-    opacity:0,
-    y:50,
-    stagger: {
-      amount: 0.5
-    },
-    ease: "power4.inOut",
-  })
-}
-
-// SWIPER
-if (document.querySelector('.swiper')) {
-
-  const swiper = new Swiper('.swiper', {
-    modules: [Navigation], 
-    centeredSlides: true,
-    slidesPerView: 'auto',
-    speed: 900,
-    spaceBetween: '0',
-    loop: true,
-    
-    navigation: {
-      nextEl: '.swiper-nav.is-next',
-      prevEl: '.swiper-nav.is-prev',
-    },
-  });
-
-  // Trigger GSAP on Swiper initialization
-  swiper.init();
+      gsap.to(portfolioGrid, { x: offsetX, y: offsetY, duration: 3, ease: "sine" });
+    });
   
-  gsap.set('.swiper-slide-active', {scale: 1});
-
-  // Ensure the first active slide has data-barba-img
-  const firstActiveSlide = document.querySelector('.swiper-slide-active');
-  const firstSlideBgImg = firstActiveSlide.querySelector('.background-img');
-  if (firstSlideBgImg) {
-    firstSlideBgImg.setAttribute('data-barba-img', '');
+    gsap.from('.portfolio-grid_wrapper', {
+      opacity: 0, scale: 0.8, duration: 1.5,
+      ease: CustomEase.create("custom", "M0,0 C0,0.05 0.25,1 1,1 "),
+      scrollTrigger: {
+        trigger: '.portfolio-grid_wrapper',
+        start: 'top 60%',
+        end: 'bottom 40%',
+        markers: false,
+        toggleActions: 'play reverse play reverse',
+      }
+    });
+  
+    const portfolioGridSection = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.portfolio-grid_wrapper',
+        start: 'top 60%',
+        end: 'bottom 40%',
+        markers: false,
+      }
+    });
+  
+    portfolioGridSection.from('.section-home_portfolio-grid h2', { opacity: 0, y: 50 });
+    
+    const portfolioGridText = new SplitType('.section-home_portfolio-grid p', { types: 'words,chars' });
+    portfolioGridSection.from(portfolioGridText.chars, {
+      opacity: 0, y: 50,
+      stagger: { amount: 0.5 },
+      ease: "power4.inOut",
+    });
   }
 
-  swiper.on('slideChangeTransitionStart', () => {
-    // Your existing slide change logic
-    gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
-    gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.8, ease: "power4.inOut" });
-
-    const activeSlide = document.querySelector('.swiper-slide-active');
-    const companyName = activeSlide.getAttribute('data-company');
-    document.getElementById('company').textContent = companyName;
-
-    // Remove data-barba-img from all .background-img elements
-    document.querySelectorAll('.background-img').forEach(img => {
-      img.removeAttribute('data-barba-img');
+  // Homepage Swiper Section
+  if (document.querySelector('.swiper')) {
+    const swiper = new Swiper('.swiper', {
+      modules: [Navigation], 
+      centeredSlides: true,
+      slidesPerView: 'auto',
+      speed: 900,
+      spaceBetween: '0',
+      loop: true,
+      navigation: {
+        nextEl: '.swiper-nav.is-next',
+        prevEl: '.swiper-nav.is-prev',
+      },
     });
+  
+    swiper.init();
+    gsap.set('.swiper-slide-active', { scale: 1 });
+  
+    const firstActiveSlide = document.querySelector('.swiper-slide-active');
+    const firstSlideBgImg = firstActiveSlide.querySelector('.background-img');
+    if (firstSlideBgImg) firstSlideBgImg.setAttribute('data-barba-img', '');
+  
+    swiper.on('slideChangeTransitionStart', () => {
+      gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
+      gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.8, ease: "power4.inOut" });
+  
+      const activeSlide = document.querySelector('.swiper-slide-active');
+      const companyName = activeSlide.getAttribute('data-company');
+      document.getElementById('company').textContent = companyName;
+  
+      document.querySelectorAll('.background-img').forEach(img => img.removeAttribute('data-barba-img'));
+  
+      const activeSlideBgImg = activeSlide.querySelector('.background-img');
+      if (activeSlideBgImg) activeSlideBgImg.setAttribute('data-barba-img', '');
+    });
+  
+    const swiperGsap = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section_home-slider',
+        start: 'top 70%',
+        end: 'bottom 30%',
+        markers: false,
+        toggleActions: 'play reverse play reverse',
+      }
+    });
+  
+    swiperGsap.from('.swiper', { y: 150, scale: 0.8, opacity: 0, duration: 1, ease: "power4.inOut" });
+    swiperGsap.from('.swiper-slide-prev', { x: '40%', duration: 0.5 }, 0.4);
+    swiperGsap.from('.swiper-slide-next', { x: '-40%', duration: 0.5 }, 0.4);
+  }
 
-    // Add data-barba-img to the .background-img inside the active slide
-    const activeSlideBgImg = activeSlide.querySelector('.background-img');
-    if (activeSlideBgImg) {
-      activeSlideBgImg.setAttribute('data-barba-img', '');
-    }
+  // Faux Links within Swiper
+  document.querySelectorAll('[data-link]').forEach(element => {
+    element.addEventListener('click', function(event) {
+      event.preventDefault();
+      const url = element.getAttribute('data-link');
+      if (url) barba.go(url);
+    });
   });
 
-  // Initial animation for swiper
-  const swiperGsap = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.section_home-slider',
-      start: 'top 70%',
-      end: 'bottom 30%',
-      markers: false,
-      toggleActions: 'play reverse play reverse',
-    }
-  });
+  homepageLoader()
+  navLogoFlip()
 
-  swiperGsap.from('.swiper', {
-    y: 150,
-    scale: 0.8,
-    opacity: 0,
-    duration: 1,
-    ease: "power4.inOut",
-  });
-  swiperGsap.from('.swiper-slide-prev', {x: '40%', duration: 0.5}, 0.4);
-  swiperGsap.from('.swiper-slide-next', {x: '-40%', duration: 0.5}, 0.4);
 }
 
-// Initialize Barba after Swiper setup to ensure first active slide is correctly set
+
+homepageJs()
+
+// BARBAJS
+
 barba.init({
   transitions: [
-    // Transition for going from homepage to portfolio and back
     {
       name: 'portfolio-transition',
       sync: true,
-      from: {
-        namespace: ['home', 'portfolio'],
-      },
-      to: {
-        namespace: ['portfolio', 'home'],
-      },
+      from: { namespace: ['home', 'portfolio'] },
+      to: { namespace: ['portfolio', 'home'] },
       async enter(data) {
         data.next.container.classList.add('is-transitioning');
-
         const currentImg = data.current.container.querySelector('video[data-barba-img]');
         const newImg = data.next.container.querySelector('.background-img');
-
         if (!currentImg || !newImg) {
           console.error('Image not found during transition');
           return;
         }
-
+        
         const currentImgParent = currentImg.parentElement;
         const newImgParent = newImg.parentElement;
-
         const state = Flip.getState(currentImg);
-
-        currentImgParent.style.height = `${currentImg.offsetHeight}px`;
-
+        
         newImg.remove();
         newImgParent.appendChild(currentImg);
-
+        
         await Flip.from(state, { duration: 1, ease: "power4.inOut" });
-
         data.next.container.classList.remove('is-transitioning');
       },
       async after(data) {
         window.scrollTo(0, 0);
-        console.log('after portfolio transition');
       },
     },
-    // GSAP Fade transition for other pages
     {
       name: 'fade-transition',
       async leave(data) {
-        await gsap.to(data.current.container, { opacity: 0, duration: 0.5, ease: "power2.out" });
+        // Kill ScrollTrigger instances
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill(true));
+        gsap.set(data.current.container, { clearProps: "all" });
+        await gsap.to(data.current.container, { opacity: 0, duration: 0.5 });
       },
       async enter(data) {
         gsap.set(data.next.container, { opacity: 0 });
-        await gsap.to(data.next.container, { opacity: 1, duration: 0.5, ease: "power2.out" });
-
-        // Check if the user is entering the homepage
+        await gsap.to(data.next.container, { opacity: 1, duration: 0.5 });
+        
+        lenis.start();
         if (data.next.namespace === 'home') {
-          navLogoFlip(); // Run the navLogoFlip() function on the homepage
+          homepageJs();
         }
+        
+        ScrollTrigger.refresh();
       }
     }
   ],
 });
-
-
-// FANCY LINKS
-document.querySelectorAll('[data-link]').forEach(element => {
-  element.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default behavior
-    const url = element.getAttribute('data-link');
-    if (url) {
-      barba.go(url);
-    }
-  });
-});
-
-
-// NAVIGATION
-let navbarStatus = false; // Track the status of the navbar
-
-function navStatus() {
-    if (!navbarStatus) {
-        // Open the navbar
-
-        gsap.set('.nav-menu_wrapper', {
-            opacity: 0
-        });
-        // gsap.set('.nav-link', { opacity: 0, y: 40 });
-
-        const navOpen = gsap.timeline();
-
-        navOpen.to('#Bottom', { y:'-20', duration:0.5 }, 0);
-        navOpen.to('#Top', { y:'20', duration:0.5 }, 0);
-
-
-        navOpen.to('.nav-menu_wrapper', {
-            display: 'flex',
-            opacity: 1,
-            duration: 0.5,
-            ease: "power4.inOut",
-        })
-
-        // navOpen.from('.logo', {
-        //   opacity:0,
-        //   duration: 1
-        // }, 0)
-
-        navOpen.from('[data-gsap="nav"]', {
-            opacity: 0,
-            y: '40',
-            duration: 1,
-            stagger: {
-                amount: 0.25,
-            },
-            ease: "power4.inOut"
-        }, '0')
-
-        navOpen.from('.nav-menu_shape-wrapper', {
-            opacity: 0,
-            x: '40',
-            duration: 1,
-        }, 0)
-
-        navOpen.from('.nav-menu_divider', {
-            height: 0,
-            duration: 1,
-            ease: "power4.inOut"
-
-        }, 0.2)
-
-        navbarStatus = true; // Update the status to open
-    } else {
-
-
-        const navClose = gsap.timeline();
-
-        navClose.to('#Bottom', { y:'0', duration:0.5 }, 0);
-        navClose.to('#Top', { y:'0', duration:0.5 }, 0);
-
-        navClose.to('.nav-menu_divider', {
-            height: 0,
-            duration: 1,
-            ease: "power4.inOut"
-        }, 0)
-
-        navClose.to('.nav-menu_shape-wrapper', {
-            opacity: 0,
-            x: '40',
-            duration: 1,
-        }, 0)
-
-        navClose.to('[data-gsap="nav"]', {
-            opacity: 0,
-            y: '40',
-            duration: 1,
-            stagger: {
-                amount: 0.25,
-            },
-            ease: "power4.inOut"
-        }, '0')
-
-        // navClose.to('.logo', {
-        //   opacity:1,
-        //   duration: 1
-        // }, 0)
-
-
-        navClose.to('.nav-menu_wrapper', {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power4.inOut",
-            onComplete: function () {
-                gsap.set('.nav-menu_wrapper', {
-                    display: 'none'
-                }); // Hide it after animation
-                // gsap.set('.logo', { clearProps: "all"  });
-                gsap.set('[data-gsap="nav"]', {
-                    clearProps: "all"
-                });
-                gsap.set('.nav-menu_divider', {
-                    clearProps: "all"
-                });
-                gsap.set('.nav-menu_shape-wrapper', {
-                    clearProps: "all"
-                });
-            }
-        })
-
-
-        navbarStatus = false; // Update the status to closed
-    }
-}
-
-document.querySelector('#nav-btn').addEventListener('click', function () {
-    navStatus()
-});
-
-
-// NAV LINK HOVER
-const navLinks = document.querySelectorAll('.nav-link'); // Select all nav-link elements
-
-navLinks.forEach(navLink => {
-    const navText = new SplitType(navLink, {
-        types: 'words, chars'
-    }); // Create SplitType instance for each nav link
-
-    const handleHoverIn = () => {
-        gsap.to(navText.chars, {
-            y: '-100%',
-            duration: 1,
-            stagger: {
-                amount: 0.5
-            },
-            ease: "power4.inOut",
-        });
-    };
-
-    const handleHoverOut = () => {
-        gsap.to(navText.chars, {
-            y: '0%',
-            duration: 1,
-            stagger: {
-                amount: 0.5
-            },
-            ease: "power4.inOut",
-        });
-    };
-
-    navLink.addEventListener('mouseenter', handleHoverIn);
-    navLink.addEventListener('mouseleave', handleHoverOut);
-});
-
-// close nav on click
-navLinks.forEach(link => {
-  link.addEventListener('click', function() {
-      navStatus();
-  });
-});
-
-
-
-// HOMEPAGE
-
-// Function to check if the user is on the homepage
-function isHomePage() {
-  // Get the current URL
-  const currentUrl = window.location.href;
-
-  // Define the homepage URL (update this as necessary)
-  const homePageUrl = window.location.origin + '/'; // Adjust if your homepage URL is different
-
-  // Check if the current URL matches the homepage URL
-  return currentUrl === homePageUrl;
-}
-
-// Run navLogoFlip if on the homepage
-if (isHomePage()) {
-  navLogoFlip();
-}
-
-
