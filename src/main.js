@@ -31,7 +31,15 @@ function runLenis(){
   
   requestAnimationFrame(loop);
   
+  if (!pageLoaded) {
+    lenis.stop();
+  } else {
+    lenis.start()
+  }
+
 }
+
+
 
 // GLOBAL CODE
     // AUDIO
@@ -132,13 +140,13 @@ function runLenis(){
   // Homepage Loader
   function homepageLoader() {
 
-    // lenis.stop();
+    runLenis()
 
     gsap.set('.footer', {opacity:0})
     gsap.set('.navigation', {opacity:0})
 
     function loadPage() {
-
+     
       const loader = gsap.timeline();
       loader.to('[data-gsap="enter"]', {opacity:0, duration: 1, pointerEvents:'none' });
       loader.to('.loader-text_first', {opacity:0, duration: 2}, 0);
@@ -164,6 +172,7 @@ function runLenis(){
       // lenis.start();
       audio.play()
       AudioPlaying = true;
+      runLenis()
 
     }
 
@@ -184,7 +193,10 @@ function runLenis(){
 // HOMEPAGE JS
 function homepageJs() { 
 
+ 
 
+  
+  ScrollTrigger.refresh();
 
   // Homepage Hero
   if (document.querySelector('.section-home_hero')) {
