@@ -5,7 +5,7 @@ import { CustomEase } from "gsap/CustomEase";
 import Lenis from 'lenis';
 import barba from '@barba/core';
 import Swiper from 'swiper';
-import { Navigation } from 'swiper/modules';
+import {Navigation } from 'swiper/modules';
 import SplitType from "split-type";
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
@@ -197,6 +197,33 @@ function homepageJs() {
 
   
   ScrollTrigger.refresh();
+
+   // Hero Logo Flip
+ function navLogoFlip() {
+  const originalNavContainer = document.querySelector('.logo-wrapper');
+  const newNavContainer = document.querySelector('.nav-bar_logo-container');
+  const navLogo = document.querySelector('.logo.is-hero');
+  gsap.set('.logo.is-nav', {display: 'none'});
+  
+  const navState = Flip.getState(navLogo);
+  ScrollTrigger.create({
+    trigger: '[data-nav="trigger"]',
+    start: 'top 80%',
+    end: 'top 20%',
+    markers: false,
+    onEnter: () => {
+      newNavContainer.appendChild(navLogo);
+      Flip.from(navState, { duration: 0.8, scale: true });
+      
+    },
+    onLeaveBack: () => {
+      const reverseState = Flip.getState(navLogo);
+      originalNavContainer.appendChild(navLogo);
+      Flip.from(reverseState, { duration: 0.8, scale: true });
+    }
+  });
+}
+navLogoFlip()
 
   // Homepage Hero
   if (document.querySelector('.section-home_hero')) {
@@ -464,8 +491,11 @@ function homepageJs() {
   if (document.querySelector('.swiper')) {
     const swiper = new Swiper('.swiper', {
       modules: [Navigation], 
+
+      
       centeredSlides: true,
       slidesPerView: 'auto',
+      allowTouchMove: false,
       speed: 900,
       spaceBetween: '0',
       loop: true,
