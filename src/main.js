@@ -39,8 +39,6 @@ function runLenis(){
 
 }
 
-
-
 // GLOBAL CODE
     // AUDIO
       // Load Music

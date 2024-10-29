@@ -15,7 +15,7 @@
   "dependencies": {
     "@barba/core": "^2.10.3",
     "gsap": "^3.12.5",
-    "lenis": "^1.1.13",
+    "lenis": "^1.1.14",
     "split-type": "^0.3.4",
     "swiper": "^11.1.14"
   }
