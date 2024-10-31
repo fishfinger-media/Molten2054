@@ -24,6 +24,11 @@ function playMusic() {
   music.fade(0, 1, 2000);
 }
 
+function pauseMusic() {
+  music.fade(1, 0, 2000);
+  music.pause();
+}
+
 // LENIS
 const lenis = new Lenis();
 function raf(time) {
@@ -275,16 +280,7 @@ function homepageJs() {
     gsap.set('.home-video_wrapper', {opacity:0, scale:0.8, });
     gsap.set('.player-control_wrapper', {opacity:0, y:50});
 
-    function secondVideoEnter() {
-      const secondAnimation = gsap.timeline();
-      secondAnimation.to('.home-video_wrapper', { opacity:1, scale:1, duration: 1, ease: 'power4.inOut' }, );
-      secondAnimation.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: togglePlay },0 );
-    }
-
-    function reverseSecondVideo() {
-      const secondAnimation = secondVideoEnter();
-      secondAnimation.reverse();
-    }
+      
 
     const videoEnter = gsap.timeline({
    
@@ -294,14 +290,31 @@ function homepageJs() {
         end: 'top 0%',
         markers: false, 
         scrub: true,
+        toggleActions: 'play none none reverse',
+
       }
     });
     
     videoEnter.to('.page-wrapper', { background: 'rgba(0, 0, 0, 1)', duration: 1, ease: 'power4.inOut' });
     videoEnter.to('.navigation', { opacity: 0, duration: 1, ease: 'power4.inOut' }, 0);
-    videoEnter.to('.footer', { opacity: 0, duration: 1, ease: 'power4.inOut', onComplete: secondVideoEnter }, 0);
+    videoEnter.to('.footer', { opacity: 0, duration: 1, ease: 'power4.inOut'}, 0);
+    videoEnter.to('.home-video_wrapper', { opacity:1, scale:1, duration: 1, ease: 'power4.inOut' }, );
+    videoEnter.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); pauseMusic() }  },0 );
     
-    // NEED TO ADD THE SCROLL PAST VIDEO TRIGGER AND PAUSE VIDEO + AUDIO LOGIC
+    const videoExit = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_video',
+        start: 'bottom 80%',
+        end: 'top 10%',
+        toggleActions: 'play none none reverse',
+      }
+    })
+
+    videoExit.to('.player-control_wrapper', { y:50, opacity:0, duration: 1, ease: 'power4.inOut' });
+    videoExit.to('.home-video_wrapper', { scale:0.8, opacity:0, duration: 1, ease: 'power4.inOut' }, 0);
+    videoExit.to('.navigation', {opacity: 1, duration: 1, ease: 'power4.inOut' });
+    videoExit.to('.footer', { opacity: 1, duration: 1, ease: 'power4.inOut' }, 0);
+    videoExit.to('.page-wrapper', { background: 'rgba(0,0,0,0)', duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); playMusic() }, }, 0);
 
   }
 
@@ -470,7 +483,110 @@ function navigationJS() {
 navigationJS()
 
 
+// BARBAJS
+if (history.scrollRestoration) {
+  history.scrollRestoration = 'manual';
+}
 
 
-homepageLoader()
-homepageJs()
+barba.init({
+  transitions: [
+    {
+      name: 'portfolio-transition',
+      sync: true,
+      debug: true,
+      logLevel: 'error',
+      from: { namespace: ['home'] },
+      to: { namespace: ['portfolio'] },
+
+      // Called after the entering page is rendered
+      async enter(data) {
+        
+        data.next.container.classList.add('is-transitioning');
+        const currentImg = data.current.container.querySelector('video[data-barba-img]');
+        const newImg = data.next.container.querySelector('.background-img');
+
+        if (!currentImg || !newImg) {
+          console.error('Image not found during transition');
+          return;
+        }
+        
+        const currentImgParent = currentImg.parentElement;
+        const newImgParent = newImg.parentElement;
+        const state = Flip.getState(currentImg);
+        
+        newImg.remove();
+        newImgParent.appendChild(currentImg);
+        
+        await Flip.from(state, { duration: 0.8, ease: "circ.inOut" });
+        data.next.container.classList.remove('is-transitioning');
+        window.scrollTo(0, 0);
+
+        killAllScrollTriggers(); 
+      },
+
+    
+    },
+
+    {
+      name: 'portfolio-transition',
+      sync: true,
+      debug: true,
+      logLevel: 'error',
+      from: { namespace: ['portfolio'] },
+      to: { namespace: ['home'] },
+
+      leave(data) {
+        return gsap.to(data.current.container, {
+          opacity: 0
+        });
+      },
+
+      enter(data) {
+        return gsap.from(data.next.container, {
+          opacity: 0
+        });
+      }
+    },
+    
+  ],
+
+  views: [
+    {
+      namespace: 'home',
+      beforeEnter() {
+        lenis.destroy()
+        console.log("lenis destoryed")
+        homepageLoader()
+        homepageJs()
+        
+      },
+      enter(data) {
+    
+      },
+      afterEnter() {
+        runLenis()
+        console.log("lenis reinitalised Home")
+        console.log(pageLoaded)
+
+        
+
+      },
+     
+    },
+    {
+      namespace: 'portfolio',
+      beforeEnter() {
+        lenis.destroy()
+        console.log("lenis destoryed")
+      },
+      afterEnter() {
+        runLenis()
+        console.log("lenis reinitalised")
+      }
+    }
+  ],
+});
+
+
+
