@@ -12,7 +12,7 @@ import {Howl, Howler} from 'howler';
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 let bgMusicPlaying = false;
-
+let homepageVisted = false
 
 setInterval(() => {
   console.log(bgMusicPlaying);
@@ -26,24 +26,23 @@ const music = new Howl({
 });
 function playMusic() {
   music.play();
-  music.fade(0, 1, 2000);
+  setTimeout(() => {
+    music.fade(0, 1, 1000);
+  }, 1000);
   bgMusicPlaying = true;
 }
 
 function pauseMusic() {
-  music.fade(1, 0, 2000);
-  music.pause();
-  bgMusicPlaying = false;
-
+  music.fade(1, 0, 1000);
+  setTimeout(() => {
+    music.pause();
+  }, 1000);
 }
 
 function toggleMusic(){
-  if (bgMusicPlaying) {
-    pauseMusic();
-    bgMusicPlaying = false;
-  } else {
+  if (bgMusicPlaying === true) {
     playMusic();
-  }
+  } 
 }
 
 // LENIS
@@ -54,6 +53,8 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
+document.body.style.overflow = 'hidden';
+lenis.stop()
 
 // HOMEPAGE LOADER JS
 function homepageLoader() {
@@ -87,9 +88,24 @@ function homepageLoader() {
     MainLoaderAnimation();
     playMusic();
     bgMusicPlaying = true;
+    homepageVisted = true
+    document.body.style.overflow = 'auto';
+    lenis.start()
   });
 
+  if (homepageVisted) {
+    restartWebflow();
+    MainLoaderAnimation();
+    document.body.style.overflow = 'auto';
+    lenis.start()
+
+  } 
+
+
 }
+
+
+
 
 // HOMEPAGE JS
 function homepageJs() {
@@ -315,7 +331,7 @@ function homepageJs() {
     videoEnter.to('.navigation', { opacity: 0, duration: 1, ease: 'power4.inOut' }, 0);
     videoEnter.to('.footer', { opacity: 0, duration: 1, ease: 'power4.inOut'}, 0);
     videoEnter.to('.home-video_wrapper', { opacity:1, scale:1, duration: 1, ease: 'power4.inOut' }, );
-    videoEnter.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); toggleMusic() }  },0 );
+    videoEnter.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); pauseMusic() }  },0 );
     
     const videoExit = gsap.timeline({
       scrollTrigger: {
@@ -534,10 +550,11 @@ barba.init({
         newImg.remove();
         newImgParent.appendChild(currentImg);
         
-        await Flip.from(state, { duration: 0.8, ease: "circ.inOut" });
+        await Flip.from(state, { duration: 1, ease: "sine.inOut",});
         data.next.container.classList.remove('is-transitioning');
         window.scrollTo(0, 0);
-
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+        gsap.globalTimeline.clear();
        
       },
 
