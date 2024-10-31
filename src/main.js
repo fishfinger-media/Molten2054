@@ -12,10 +12,10 @@ import {Howl, Howler} from 'howler';
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 let bgMusicPlaying = false;
-
+let hasPlayedIntro = false;
 
 setInterval(() => {
-  console.log(bgMusicPlaying);
+  console.log('has intro played:', hasPlayedIntro);
 }, 1000);
 
 const music = new Howl({
@@ -87,6 +87,7 @@ function homepageLoader() {
     MainLoaderAnimation();
     playMusic();
     bgMusicPlaying = true;
+    hasPlayedIntro = true;
   });
 
 }
@@ -564,11 +565,16 @@ barba.init({
           opacity: 0
           
         });
+      
+      },
+      afterEnter(data) {
         
-       
-
-      }
-    },
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        ScrollTrigger.refresh();  
+        restartWebflow()
+   
+  }
+}
     
   ],
 
@@ -578,10 +584,10 @@ barba.init({
       beforeEnter() {
         console.log("lenis destoryed")
         
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        ScrollTrigger.refresh();
+
         homepageLoader()
         homepageJs()
+
       },
       enter(data) {
     
