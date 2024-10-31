@@ -522,7 +522,7 @@ barba.init({
         data.next.container.classList.remove('is-transitioning');
         window.scrollTo(0, 0);
 
-        killAllScrollTriggers(); 
+       
       },
 
     
@@ -555,7 +555,6 @@ barba.init({
     {
       namespace: 'home',
       beforeEnter() {
-        lenis.destroy()
         console.log("lenis destoryed")
         homepageLoader()
         homepageJs()
@@ -565,7 +564,6 @@ barba.init({
     
       },
       afterEnter() {
-        runLenis()
         console.log("lenis reinitalised Home")
         console.log(pageLoaded)
 
