@@ -588,7 +588,6 @@ barba.init({
     {
       namespace: 'home',
       beforeEnter() {
-        console.log("lenis destoryed")
         homepageLoader()
         homepageJs()
         
@@ -597,11 +596,6 @@ barba.init({
     
       },
       afterEnter() {
-        console.log("lenis reinitalised Home")
-        console.log(pageLoaded)
-
-        
-
       },
      
     },
@@ -612,7 +606,13 @@ barba.init({
         console.log("lenis destoryed")
       },
       afterEnter() {
-        runLenis()
+        const lenis = new Lenis();
+        function raf(time) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+        
         console.log("lenis reinitalised")
       }
     }
