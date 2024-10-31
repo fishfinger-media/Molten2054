@@ -538,7 +538,8 @@ barba.init({
         data.next.container.classList.remove('is-transitioning');
         window.scrollTo(0, 0);
 
-       
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        ScrollTrigger.refresh();
       },
 
     
@@ -561,7 +562,11 @@ barba.init({
       enter(data) {
         return gsap.from(data.next.container, {
           opacity: 0
+          
         });
+        
+       
+
       }
     },
     
@@ -572,9 +577,11 @@ barba.init({
       namespace: 'home',
       beforeEnter() {
         console.log("lenis destoryed")
+        
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        ScrollTrigger.refresh();
         homepageLoader()
         homepageJs()
-        
       },
       enter(data) {
     
