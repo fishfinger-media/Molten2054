@@ -88,7 +88,18 @@ function homepageLoader() {
     playMusic();
     bgMusicPlaying = true;
     hasPlayedIntro = true;
+    // document.body.style.overflow = '';
+    // lenis.start();
+    homepageJs()
   });
+
+  if (hasPlayedIntro === false) { 
+    document.body.style.overflow = 'hidden';
+    lenis.stop();
+    
+  } else {
+    MainLoaderAnimation();
+  }
 
 }
 
@@ -500,12 +511,6 @@ function navigationJS() {
 navigationJS()
 
 
-// BARBAJS
-if (history.scrollRestoration) {
-  history.scrollRestoration = 'manual';
-}
-
-
 barba.init({
   transitions: [
     {
@@ -518,7 +523,6 @@ barba.init({
 
       // Called after the entering page is rendered
       async enter(data) {
-        
         data.next.container.classList.add('is-transitioning');
         const currentImg = data.current.container.querySelector('video[data-barba-img]');
         const newImg = data.next.container.querySelector('.background-img');
@@ -542,12 +546,10 @@ barba.init({
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         ScrollTrigger.refresh();
       },
-
-    
     },
 
     {
-      name: 'portfolio-transition',
+      name: 'home-transition',
       sync: true,
       debug: true,
       logLevel: 'error',
@@ -561,59 +563,38 @@ barba.init({
       },
 
       enter(data) {
-        return gsap.from(data.next.container, {
-          opacity: 0
-          
-        });
-      
-      },
-      afterEnter(data) {
-        
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        ScrollTrigger.refresh();  
-        restartWebflow()
-   
-  }
-}
-    
+        // Instead of animating, do a hard refresh
+        window.location.reload();
+      }
+    }
   ],
 
   views: [
     {
       namespace: 'home',
       beforeEnter() {
-        console.log("lenis destoryed")
-        
-
-        homepageLoader()
-        homepageJs()
-
+        console.log("lenis destroyed");
+        homepageLoader();
+        homepageJs();
       },
-      enter(data) {
-    
-      },
+      enter(data) {},
       afterEnter() {
-        console.log("lenis reinitalised Home")
-        console.log(pageLoaded)
-
-        
-
+        console.log("lenis reinitalised Home");
+        console.log(pageLoaded);
       },
-     
     },
     {
       namespace: 'portfolio',
       beforeEnter() {
-        lenis.destroy()
-        console.log("lenis destoryed")
+        lenis.destroy();
+        console.log("lenis destroyed");
       },
       afterEnter() {
-        runLenis()
-        console.log("lenis reinitalised")
+        runLenis();
+        console.log("lenis reinitalised");
       }
     }
   ],
 });
-
 
 
