@@ -88,8 +88,8 @@ function homepageLoader() {
     playMusic();
     bgMusicPlaying = true;
     hasPlayedIntro = true;
-    // document.body.style.overflow = '';
-    // lenis.start();
+    document.body.style.overflow = '';
+    lenis.start();
     homepageJs()
   });
 
