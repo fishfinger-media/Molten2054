@@ -13,6 +13,11 @@ import {Howl, Howler} from 'howler';
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 let bgMusicPlaying = false;
 
+
+setInterval(() => {
+  console.log(bgMusicPlaying);
+}, 1000);
+
 const music = new Howl({
   src: ['https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3'],
   autoplay: false,
@@ -22,11 +27,23 @@ const music = new Howl({
 function playMusic() {
   music.play();
   music.fade(0, 1, 2000);
+  bgMusicPlaying = true;
 }
 
 function pauseMusic() {
   music.fade(1, 0, 2000);
   music.pause();
+  bgMusicPlaying = false;
+
+}
+
+function toggleMusic(){
+  if (bgMusicPlaying) {
+    pauseMusic();
+    bgMusicPlaying = false;
+  } else {
+    playMusic();
+  }
 }
 
 // LENIS
@@ -69,6 +86,7 @@ function homepageLoader() {
   document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
     MainLoaderAnimation();
     playMusic();
+    bgMusicPlaying = true;
   });
 
 }
@@ -280,8 +298,6 @@ function homepageJs() {
     gsap.set('.home-video_wrapper', {opacity:0, scale:0.8, });
     gsap.set('.player-control_wrapper', {opacity:0, y:50});
 
-      
-
     const videoEnter = gsap.timeline({
    
       scrollTrigger: {
@@ -299,7 +315,7 @@ function homepageJs() {
     videoEnter.to('.navigation', { opacity: 0, duration: 1, ease: 'power4.inOut' }, 0);
     videoEnter.to('.footer', { opacity: 0, duration: 1, ease: 'power4.inOut'}, 0);
     videoEnter.to('.home-video_wrapper', { opacity:1, scale:1, duration: 1, ease: 'power4.inOut' }, );
-    videoEnter.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); pauseMusic() }  },0 );
+    videoEnter.to('.player-control_wrapper', { opacity:1, y:0, duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); toggleMusic() }  },0 );
     
     const videoExit = gsap.timeline({
       scrollTrigger: {
@@ -314,7 +330,7 @@ function homepageJs() {
     videoExit.to('.home-video_wrapper', { scale:0.8, opacity:0, duration: 1, ease: 'power4.inOut' }, 0);
     videoExit.to('.navigation', {opacity: 1, duration: 1, ease: 'power4.inOut' });
     videoExit.to('.footer', { opacity: 1, duration: 1, ease: 'power4.inOut' }, 0);
-    videoExit.to('.page-wrapper', { background: 'rgba(0,0,0,0)', duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); playMusic() }, }, 0);
+    videoExit.to('.page-wrapper', { background: 'rgba(0,0,0,0)', duration: 1, ease: 'power4.inOut', onComplete: () => { togglePlay(); toggleMusic() }, }, 0);
 
   }
 
