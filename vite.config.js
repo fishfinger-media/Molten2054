@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [glsl()],
   server: {
     host: 'localhost',
-    cors: '*',
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
     hmr: {
       host: 'localhost',
       protocol: 'ws',
@@ -30,3 +33,5 @@ export default defineConfig({
     },
   },
 })
+
+
