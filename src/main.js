@@ -10,6 +10,9 @@ import SplitType from "split-type";
 import { cloneNode, restartWebflow } from '@finsweet/ts-utils';
 import {Howl, Howler} from 'howler';
 
+history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 let musicPlaying = false;
 document.getElementById('off-txt').style.opacity = '0.5';
@@ -161,7 +164,7 @@ if (document.querySelector('.section-home_hero')) {
     duration: 1,
   });
 
-  heroExit.to('.hero_earth-wrapper', {
+  heroExit.to('.home-hero_background', {
     y: 2000,
     scale: 2,
     pointerEvents: 'none',
@@ -524,14 +527,39 @@ gsap.from('.social-share_wrapper a', {
   stagger: 0.1,
   scrollTrigger: {
     trigger: '[data-nav="trigger"]',
-    start: 'top 60%'
+    start: 'top 60%',
+    end: 'top 90%',
+    markers: true,
+    toggleActions: 'play none reverse none' 
   }
-})
+});
 
 
+gsap.set('.footer', { opacity: 0 });
+gsap.set('.navigation', { opacity: 0 });
+gsap.set('.hero-shapes_loader-container', { opacity: 0 });
+gsap.set('.home-hero_content', { opacity: 0 });
+
+gsap.to('.hero-shapes_loader-container', { opacity: 1, duration: 2, delay: 0.2, ease: "power4.inOut" });
+gsap.to('.home-hero_content', { opacity: 1, duration: 2, delay: 0.5, ease: "power4.inOut" });
+
+document.body.style.overflow = 'hidden';
+lenis.stop()
 
 function loader() {
+  document.body.style.overflow = '';
+  lenis.start()
+  toggleMusic();
+
   const loader = gsap.timeline();
+  loader.to('.earth', {opacity: 1, duration: 0, ease: "power4.inOut" });
+  loader.to('.loader-text_first', { opacity: 0, duration: 2, ease: "power4.inOut" }, 0);
+  loader.to('.hero-button-wrapper', { autoAlpha: 0, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.loader-text_main', { opacity: 1, duration: 2, ease: "power4.inOut" }, 0);
+  loader.to('.loader-shapes', { opacity: 0, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.home_hero_loader', { autoAlpha: 0, duration: 1, delay: 0.2, ease: "power4.inOut" }, 0);
+  loader.to('.footer', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.navigation', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
 
   const originalContainer = document.querySelector('.hero-shapes_loader-container');
   const newContainer = document.querySelector('.hero-shapes_final-container');
@@ -552,7 +580,6 @@ document.querySelector('[data-gsap="enter"]').addEventListener('click', function
   loader();
 });
 
-console.log("yolo")
 
 
 
