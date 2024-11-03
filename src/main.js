@@ -593,40 +593,48 @@ function homepageJS(){
 
 }
 
+function portfolioExit() {
+ 
+  gsap.to('#portfolio-content', {opacity: 0, duration: 0.5, ease: "power4.inOut" });  
+  gsap.to('.main-wrapper.is-home', {opacity:1, duration: 0.5, ease: "power4.inOut" });  
+  gsap.to('#portfolio-content', {display: 'none'})
+  mainLenis.start();
+  portfolioLenis.stop();
+  mainLenis.raf
+  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
+}
+
+// HTMX handlers
+document.body.addEventListener('htmx:beforeSwap', function(evt) {
+  if (evt.detail.target.id === 'portfolio-content') {
+      document.body.classList.add('modal-open');
+      mainLenis.stop();
+      portfolioLenis.start();
+  }
+});
+
 
   htmx.on("htmx:afterSwap", function(evt) {
     const lenis = new Lenis({
       prevent: (node) => node.id === 'portfolio-content',
     })
     document.body.style.overflow = 'hidden';
-    document.querySelector('.htmx').style.display = 'block';
+
+    gsap.to('#portfolio-content', {display: 'block'})
+    gsap.to('#portfolio-content', {opacity: 1, duration: 0.5, ease: "power4.inOut" });
+    gsap.to('.main-wrapper.is-home', {opacity:0, duration: 0.5, ease: "power4.inOut" });  
+
+    setTimeout(() => {
+      portfolioLenis.raf
+    }, 1000);
+
+    document.querySelector("[data-close-portfolio]").addEventListener('click', function() {
+      portfolioExit();
+    });
   });
 
-  // HTMX handlers
-  document.body.addEventListener('htmx:beforeSwap', function(evt) {
-    if (evt.detail.target.id === 'portfolio-content') {
-        document.body.classList.add('modal-open');
-        document.getElementById('portfolio-content').classList.add('active');
-        mainLenis.stop();
-        portfolioLenis.start();
-    }
-  });
-
-
-        // Add a close button handler (you'll need to add a close button in your portfolio.html)
-        document.addEventListener('click', function(e) {
-          if (e.target.matches('[data-close-portfolio]')) {
-              closePortfolio();
-          }
-      });
-
-      function closePortfolio() {
-          document.body.classList.remove('modal-open');
-          document.getElementById('portfolio-content').classList.remove('active');
-          portfolioLenis.stop();
-          mainLenis.start();
-      }
-
+  
 
 
 
