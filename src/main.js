@@ -77,25 +77,17 @@ function navigationJS() {
 navigationJS()
 
 // LENIS
-const mainLenis = new Lenis();
-const portfolioLenis = new Lenis({
-    wrapper: document.querySelector('#portfolio-content'),
-    content: document.querySelector('#portfolio-content')
-});
+const lenis = new Lenis();
 
-// RAF handler that switches between Lenis instances
 function raf(time) {
-    if (document.body.classList.contains('modal-open')) {
-        portfolioLenis.raf(time);
-    } else {
-        mainLenis.raf(time);
-    }
-    requestAnimationFrame(raf);
+  lenis.raf(time);
+  requestAnimationFrame(raf);
 }
+
 requestAnimationFrame(raf);
 
-mainLenis.on('scroll', ScrollTrigger.update);
-ScrollTrigger.addEventListener('refresh', () => mainLenis.resize());
+lenis.on('scroll', ScrollTrigger.update);
+ScrollTrigger.addEventListener('refresh', () => lenis.resize());
 
 
 // MUSIC
@@ -142,7 +134,7 @@ function loaderInit(){
   gsap.to('.home-hero_content', { opacity: 1, duration: 2, delay: 0.5, ease: "power4.inOut" });
 
   document.body.style.overflow = 'hidden';
-  mainLenis.stop()
+  lenis.stop()
 
 }
 
@@ -151,7 +143,7 @@ function loader() {
   console.log("loader")
  
   document.body.style.overflow = '';
-  mainLenis.start()
+  lenis.start()
   
   if (!musicPlaying) {
     toggleMusic();
@@ -470,32 +462,50 @@ document.querySelector('[data-gsap="enter"]').addEventListener('click', function
 
 // Update: Modified Barba.js initialization
 var websiteLoadedAlready = false;
-
-
 barba.init({
-  debug: true, // Enable debug mode to see what's happening
+  debug: true,
   preventRunning: true,
   transitions: [
     {
       name: 'opacity-transition',
       async leave(data) {
-        // Kill all ScrollTriggers before transition
+        // Kill all ScrollTriggers and clean up
         ScrollTrigger.getAll().forEach(st => st.kill());
         
-        await gsap.to(data.current.container, {
+        // Store the scroll position
+        data.current.container.dataset.scrollPosition = window.scrollY;
+
+        const timeline = gsap.timeline();
+        await timeline.to(data.current.container, {
+          opacity: 0,
+          duration: 0.5
+        });
+
+        // Clean up any running animations
+        gsap.killTweensOf("*");
+      },
+      async enter(data) {
+        // Reset scroll position to top for new page
+        window.scrollTo(0, 0);
+        
+        // Ensure the new container is visible
+        data.next.container.style.visibility = 'visible';
+        
+        const timeline = gsap.timeline();
+        await timeline.from(data.next.container, {
           opacity: 0,
           duration: 0.5
         });
       },
-      async enter(data) {
-      
-      
-      
+      async beforeEnter(data) {
+        // Clean up old content
+        if (data.current && data.current.container) {
+          data.current.container.remove();
+        }
         
-        await gsap.from(data.next.container, {
-          opacity: 0,
-          duration: 0.5
-        });
+        // Reset any global states
+        ScrollTrigger.clearScrollMemory();
+        ScrollTrigger.refresh(true);
       },
       after(data) {
         // Reinitialize everything
@@ -525,8 +535,13 @@ barba.init({
           restartWebflow();
           homepageJS();
           
+          // Restart videos if any
+          document.querySelectorAll('.swiper video').forEach(video => {
+            if (video.paused) video.play();
+          });
+          
           // Update scroll systems
-          mainLenis.resize();
+          lenis.resize();
           ScrollTrigger.refresh(true);
           
           if (websiteLoadedAlready) {
@@ -543,66 +558,40 @@ barba.init({
         // Initialize base functionality
         homepageJS();
         loaderInit();
-        portfolioPopup();
-        navLogoFlip()
+        navLogoFlip();
       },
       afterEnter() {
         ScrollTrigger.refresh(true);
+        // Ensure proper scroll position
+        window.scrollTo(0, 0);
       }
-    }
+    },
+    {
+      namespace: 'portfolio',
+      beforeEnter() {
+        // Clean up any previous page states
+        ScrollTrigger.getAll().forEach(st => st.kill());
+        gsap.killTweensOf("*");
+      },
+      afterEnter() {
+        window.scrollTo(0, 0);
+        // Restart videos
+        document.querySelectorAll('video').forEach(video => {
+          if (video.paused) video.play();
+        });
+        // Refresh scroll triggers
+        ScrollTrigger.refresh(true);
+      }
+    },
   ]
+});
+
+// Add popstate handler for browser back/forward buttons
+window.addEventListener('popstate', () => {
+  ScrollTrigger.clearScrollMemory();
+  ScrollTrigger.refresh(true);
 });
 
 
 
-// Update: Modified portfolio popup handler
-function portfolioPopup() {
-  function portfolioExit() {
-    gsap.to('#portfolio-content', {
-      opacity: 0, 
-      duration: 0.5, 
-      ease: "power4.inOut",
-      onComplete: () => {
-        ScrollTrigger.refresh(true);
-      }
-    });  
-    gsap.to('.main-wrapper.is-home', {opacity: 1, duration: 0.5, ease: "power4.inOut" });  
-    gsap.to('#portfolio-content', {display: 'none'});
-    mainLenis.start();
-    portfolioLenis.stop();
-    document.body.style.overflow = '';
-    document.body.classList.remove('modal-open');
-  }
-  
-  document.body.addEventListener('htmx:beforeSwap', function(evt) {
-    if (evt.detail.target.id === 'portfolio-content') {
-      document.body.classList.add('modal-open');
-      mainLenis.stop();
-      portfolioLenis.start();
-    }
-  });
-  
-  htmx.on("htmx:afterSwap", function(evt) {
-    const lenis = new Lenis({
-      prevent: (node) => node.id === 'portfolio-content',
-    });
-    
-    document.body.style.overflow = 'hidden';
-    
-    gsap.to('#portfolio-content', {
-      display: 'block',
-      onComplete: () => {
-        ScrollTrigger.refresh(true);
-      }
-    });
-    gsap.to('#portfolio-content', {opacity: 1, duration: 0.5, ease: "power4.inOut" });
-    gsap.to('.main-wrapper.is-home', {opacity: 0, duration: 0.5, ease: "power4.inOut" });  
 
-    setTimeout(() => {
-      portfolioLenis.raf();
-      ScrollTrigger.refresh(true);
-    }, 1000);
-
-    document.querySelector("[data-close-portfolio]")?.addEventListener('click', portfolioExit);
-  });
-}
