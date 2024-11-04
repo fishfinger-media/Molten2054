@@ -674,7 +674,7 @@ window.addEventListener('load', () => {
 
 
 
-document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+document.querySelectorAll('[data-gsap="enter"]').addEventListener('click', function() {
   loader();
   websiteLoadedAlready =  true;
 });
