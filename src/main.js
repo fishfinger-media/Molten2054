@@ -126,7 +126,49 @@ document.querySelector('.nav-bar_link.is-music').addEventListener('click', funct
   toggleMusic()
 });
 
-
+function videoPLyr(){
+  const player = new Plyr('#player', {
+    controls: [
+        'play-large',
+        'play',
+        'progress',
+        'current-time',
+        'duration',
+        'mute',
+        'volume',
+        'fullscreen'
+    ],
+    
+    resetOnEnd: true,
+    keyboard: { focused: true, global: true },
+    tooltips: { controls: true, seek: true },
+    quality: {
+        default: 1080,
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
+    }
+  });
+  
+  // Event listeners
+  player.on('ready', () => {
+    console.log('Player is ready');
+  });
+  
+  player.on('play', () => {
+    if (musicPlaying  === true) {
+      music.pause()
+    }
+  });
+  
+  player.on('pause', () => {
+    if (musicPlaying  === true) {
+      music.play()
+    }
+  });
+  
+  player.on('ended', () => {
+    console.log('Video ended');
+  });
+}
 
 function loaderInit(){
   gsap.set('.footer', { opacity: 0 });
@@ -555,11 +597,8 @@ barba.init({
         loaderInit();
        
         navLogoFlip()
-
-        document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
-          loader();
-          websiteLoadedAlready =  true;
-        });
+        videoPLyr()
+       
       
       },
       afterEnter() {
@@ -577,6 +616,12 @@ barba.init({
       namespace: 'about',
       afterEnter() {
         window.scrollTo(0, 0);
+      }
+    }, 
+    {
+      namespace: 'film',
+      afterEnter() {
+        videoPLyr()
       }
     }
   ]
@@ -627,44 +672,9 @@ window.addEventListener('load', () => {
   }
 });
 
-const player = new Plyr('#player', {
-  controls: [
-      'play-large',
-      'play',
-      'progress',
-      'current-time',
-      'duration',
-      'mute',
-      'volume',
-      'fullscreen'
-  ],
-  
-  resetOnEnd: true,
-  keyboard: { focused: true, global: true },
-  tooltips: { controls: true, seek: true },
-  quality: {
-      default: 1080,
-      options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
-  }
-});
 
-// Event listeners
-player.on('ready', () => {
-  console.log('Player is ready');
-});
 
-player.on('play', () => {
-  if (musicPlaying  === true) {
-    music.pause()
-  }
-});
-
-player.on('pause', () => {
-  if (musicPlaying  === true) {
-    music.play()
-  }
-});
-
-player.on('ended', () => {
-  console.log('Video ended');
+document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+  loader();
+  websiteLoadedAlready =  true;
 });
