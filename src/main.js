@@ -17,6 +17,21 @@ gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
 let musicPlaying = false;
 document.getElementById('off-txt').style.opacity = '0.5';
 
+function isElementReady(element) {
+  return element && 
+         element.offsetWidth > 0 && 
+         element.offsetHeight > 0 && 
+         window.getComputedStyle(element).display !== 'none';
+}
+
+function ensureElementDimensions(element) {
+  if (element) {
+    gsap.set(element, { clearProps: "all" });
+    element.offsetHeight; // Force reflow
+    return true;
+  }
+  return false;
+}
 
 // NAVIGATION JS
 function navigationJS() {
@@ -138,40 +153,6 @@ function loaderInit(){
 
 }
 
-function loader() {
-
-  console.log("loader")
- 
-  document.body.style.overflow = '';
-  lenis.start()
-  
-  if (!musicPlaying) {
-    toggleMusic();
-  }
-
-  const loader = gsap.timeline();
-  loader.to('.earth', {opacity: 1, duration: 0, ease: "power4.inOut" });
-  loader.to('.loader-text_first', { opacity: 0, duration: 2, ease: "power4.inOut" }, 0);
-  loader.to('.hero-button-wrapper', { autoAlpha: 0, duration: 1, ease: "power4.inOut" }, 0);
-  loader.to('.loader-text_main', { opacity: 1, duration: 2, ease: "power4.inOut" }, 0);
-  loader.to('.loader-shapes', { opacity: 0, duration: 1, ease: "power4.inOut" }, 0);
-  loader.to('.home_hero_loader', { autoAlpha: 0, duration: 1, delay: 0.2, ease: "power4.inOut" }, 0);
-  loader.to('.footer', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
-  loader.to('.navigation', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
-
-  const originalContainer = document.querySelector('.hero-shapes_loader-container');
-  const newContainer = document.querySelector('.hero-shapes_final-container');
-  const img = document.querySelector('.shapes-wrapper');
-  const state = Flip.getState(img);
-
-    newContainer.appendChild(img);
-  Flip.from(state, {
-    duration: 1.5,
-    ease: "power1.inOut",
-    scale: false
-  });
-
-}
 
 function homepageJS(){ 
   // Homepage Hero
@@ -434,23 +415,45 @@ function navLogoFlip() {
   const originalNavContainer = document.querySelector('.logo-wrapper');
   const newNavContainer = document.querySelector('.nav-bar_logo-container');
   const navLogo = document.querySelector('.logo.is-hero');
+  
+  if (!isElementReady(navLogo) || !newNavContainer || !originalNavContainer) {
+    console.warn('Nav logo elements not ready for animation');
+    return;
+  }
+
   gsap.set('.logo.is-nav', {display: 'none'});
   
-  const navState = Flip.getState(navLogo);
-  ScrollTrigger.create({
-    trigger: '[data-nav="trigger"]',
-    start: 'top 80%',
-    end: 'top 20%',
-    onEnter: () => {
-      newNavContainer.appendChild(navLogo);
-      Flip.from(navState, { duration: 0.8, scale: true });
-      
-    },
-    onLeaveBack: () => {
-      const reverseState = Flip.getState(navLogo);
-      originalNavContainer.appendChild(navLogo);
-      Flip.from(reverseState, { duration: 0.8, scale: true });
-    }
+  // Wait for next frame to ensure styles are applied
+  requestAnimationFrame(() => {
+    ensureElementDimensions(navLogo);
+    
+    const navState = Flip.getState(navLogo);
+    ScrollTrigger.create({
+      trigger: '[data-nav="trigger"]',
+      start: 'top 80%',
+      end: 'top 20%',
+      onEnter: () => {
+        if (isElementReady(navLogo)) {
+          newNavContainer.appendChild(navLogo);
+          Flip.from(navState, { 
+            duration: 0.8, 
+            scale: true,
+            onStart: () => ensureElementDimensions(navLogo)
+          });
+        }
+      },
+      onLeaveBack: () => {
+        if (isElementReady(navLogo)) {
+          const reverseState = Flip.getState(navLogo);
+          originalNavContainer.appendChild(navLogo);
+          Flip.from(reverseState, { 
+            duration: 0.8, 
+            scale: true,
+            onStart: () => ensureElementDimensions(navLogo)
+          });
+        }
+      }
+    });
   });
 }
 
@@ -460,8 +463,65 @@ document.querySelector('[data-gsap="enter"]').addEventListener('click', function
   websiteLoadedAlready =  true;
 });
 
-// Update: Modified Barba.js initialization
-var websiteLoadedAlready = false;
+function loader() {
+  console.log("loader");
+ 
+  document.body.style.overflow = '';
+  lenis.start();
+  
+  if (!musicPlaying) {
+    toggleMusic();
+  }
+
+  const loader = gsap.timeline();
+  loader.to('.earth', {opacity: 1, duration: 0, ease: "power4.inOut" });
+  loader.to('.loader-text_first', { opacity: 0, duration: 2, ease: "power4.inOut" }, 0);
+  loader.to('.hero-button-wrapper', { autoAlpha: 0, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.loader-text_main', { opacity: 1, duration: 2, ease: "power4.inOut" }, 0);
+  loader.to('.loader-shapes', { opacity: 0, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.home_hero_loader', { autoAlpha: 0, duration: 1, delay: 0.2, ease: "power4.inOut" }, 0);
+  loader.to('.footer', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
+  loader.to('.navigation', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
+
+  const originalContainer = document.querySelector('.hero-shapes_loader-container');
+  const newContainer = document.querySelector('.hero-shapes_final-container');
+  const img = document.querySelector('.shapes-wrapper');
+
+  if (!isElementReady(img) || !newContainer || !originalContainer) {
+    console.warn('Loader elements not ready for animation');
+    return;
+  }
+
+  // Wait for images to load
+  const images = img.querySelectorAll('img');
+  const imagePromises = Array.from(images).map(img => {
+    return new Promise((resolve) => {
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Continue even if image fails to load
+      }
+    });
+  });
+
+  Promise.all(imagePromises).then(() => {
+    ensureElementDimensions(img);
+    const state = Flip.getState(img);
+    
+    requestAnimationFrame(() => {
+      newContainer.appendChild(img);
+      Flip.from(state, {
+        duration: 1.5,
+        ease: "power1.inOut",
+        scale: false,
+        onStart: () => ensureElementDimensions(img)
+      });
+    });
+  });
+}
+
+// Update Barba.js transitions
 barba.init({
   debug: true,
   preventRunning: true,
@@ -472,8 +532,10 @@ barba.init({
         // Kill all ScrollTriggers and clean up
         ScrollTrigger.getAll().forEach(st => st.kill());
         
-        // Store the scroll position
         data.current.container.dataset.scrollPosition = window.scrollY;
+
+        // Clean up any running Flip animations
+        Flip.getAllFlips().forEach(flip => flip.kill());
 
         const timeline = gsap.timeline();
         await timeline.to(data.current.container, {
@@ -481,15 +543,18 @@ barba.init({
           duration: 0.5
         });
 
-        // Clean up any running animations
         gsap.killTweensOf("*");
       },
       async enter(data) {
-        // Reset scroll position to top for new page
         window.scrollTo(0, 0);
         
-        // Ensure the new container is visible
-        data.next.container.style.visibility = 'visible';
+        // Ensure elements are ready before animating
+        await new Promise(resolve => {
+          requestAnimationFrame(() => {
+            data.next.container.style.visibility = 'visible';
+            resolve();
+          });
+        });
         
         const timeline = gsap.timeline();
         await timeline.from(data.next.container, {
@@ -498,23 +563,22 @@ barba.init({
         });
       },
       async beforeEnter(data) {
-        // Clean up old content
         if (data.current && data.current.container) {
           data.current.container.remove();
         }
         
-        // Reset any global states
         ScrollTrigger.clearScrollMemory();
         ScrollTrigger.refresh(true);
+
+        // Wait for next frame to ensure DOM is ready
+        await new Promise(resolve => requestAnimationFrame(resolve));
       },
       after(data) {
-        // Reinitialize everything
         if (data.next.namespace === 'home') {
-          // Clear any existing animations
           gsap.killTweensOf("*");
           
           // Reset all GSAP-modified elements
-          gsap.set([
+          const elementsToReset = [
             '.lines',
             '.section-home_intro h2',
             '.portfolio-grid_wrapper',
@@ -529,23 +593,32 @@ barba.init({
             '.loader-text_wrapper',
             '.loader-shadow',
             '.home-hero_background'
-          ], { clearProps: "all" });
+          ];
+
+          elementsToReset.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+              if (isElementReady(element)) {
+                gsap.set(element, { clearProps: "all" });
+              }
+            });
+          });
           
-          // Reinitialize homepage
           restartWebflow();
           homepageJS();
           
-          // Restart videos if any
           document.querySelectorAll('.swiper video').forEach(video => {
             if (video.paused) video.play();
           });
           
-          // Update scroll systems
           lenis.resize();
           ScrollTrigger.refresh(true);
           
           if (websiteLoadedAlready) {
-            loader();
+            // Wait for next frame before running loader
+            requestAnimationFrame(() => {
+              loader();
+            });
           }
         }
       }
@@ -555,31 +628,30 @@ barba.init({
     {
       namespace: 'home',
       beforeEnter() {
-        // Initialize base functionality
         homepageJS();
         loaderInit();
-        navLogoFlip();
+        // Wait for elements to be ready before initializing nav logo flip
+        requestAnimationFrame(() => {
+          navLogoFlip();
+        });
       },
       afterEnter() {
         ScrollTrigger.refresh(true);
-        // Ensure proper scroll position
         window.scrollTo(0, 0);
       }
     },
     {
       namespace: 'portfolio',
       beforeEnter() {
-        // Clean up any previous page states
         ScrollTrigger.getAll().forEach(st => st.kill());
+        Flip.getAllFlips().forEach(flip => flip.kill());
         gsap.killTweensOf("*");
       },
       afterEnter() {
         window.scrollTo(0, 0);
-        // Restart videos
         document.querySelectorAll('video').forEach(video => {
           if (video.paused) video.play();
         });
-        // Refresh scroll triggers
         ScrollTrigger.refresh(true);
       }
     },
@@ -591,7 +663,4 @@ window.addEventListener('popstate', () => {
   ScrollTrigger.clearScrollMemory();
   ScrollTrigger.refresh(true);
 });
-
-
-
 
