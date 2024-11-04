@@ -571,8 +571,7 @@ barba.init({
       namespace: 'portfolio',
       beforeEnter() {
         // Clean up any previous page states
-        ScrollTrigger.getAll().forEach(st => st.kill());
-        gsap.killTweensOf("*");
+  
       },
       afterEnter() {
         window.scrollTo(0, 0);
