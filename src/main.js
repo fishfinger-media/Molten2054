@@ -663,14 +663,8 @@ document.body.addEventListener('htmx:beforeSwap', function(evt) {
     });
   });
 
-
-
-
-
-
-if (document.body.hasAttribute('data-page="home"')) {
-  document.body.style.overflow = 'hidden';
-  mainLenis.stop();
   navLogoFlip()
   homepageJS()  
-}
+
+
+
