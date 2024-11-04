@@ -460,13 +460,6 @@ function navLogoFlip() {
 }
 
 
-if (document.querySelector('[data-gsap="enter]')){
-  document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
-    loader();
-    websiteLoadedAlready =  true;
-  });
-}
-
 
 // Update: Modified Barba.js initialization
 var websiteLoadedAlready = false;
@@ -562,6 +555,12 @@ barba.init({
         loaderInit();
        
         navLogoFlip()
+
+        document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+          loader();
+          websiteLoadedAlready =  true;
+        });
+      
       },
       afterEnter() {
         ScrollTrigger.refresh(true);
