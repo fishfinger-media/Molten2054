@@ -569,22 +569,14 @@ barba.init({
 
     {
       namespace: 'default',
-    beforeEnter({ next }) {
-      // Handle direct visits with hash in URL
-      const hash = window.location.hash;
-      if (hash) {
-        const targetId = hash.replace('#', '');
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.offsetTop,
-            behavior: 'smooth'
-          });
+      beforeEnter({ next }) {
+        // Handle direct visits with hash in URL
+        const hash = window.location.hash;
+        if (hash) {
+          handleHashNavigation(hash, true);
         }
       }
-    }
-    }
+    },
   ]
 });
 
@@ -592,15 +584,33 @@ barba.init({
 document.addEventListener('click', (e) => {
   const anchor = e.target.closest('a[href*="#"]');
   if (anchor) {
-    const targetId = anchor.getAttribute('href').split('#')[1];
-    const targetElement = document.getElementById(targetId);
+    const href = anchor.getAttribute('href');
+    const isExternal = anchor.hostname !== window.location.hostname;
     
-    if (targetElement) {
+    if (!isExternal && href.includes('#')) {
       e.preventDefault();
-      window.scrollTo({
-        top: targetElement.offsetTop,
-        behavior: 'smooth'
-      });
+      
+      const [path, hash] = href.split('#');
+      const currentPath = window.location.pathname;
+      
+      if (path && path !== currentPath) {
+        // If linking to different page with hash, update URL and let Barba handle it
+        window.location.href = href;
+      } else {
+        // If same-page anchor, scroll smoothly
+        const targetElement = document.getElementById(hash);
+        if (targetElement) {
+          scrollToElement(targetElement);
+          // Update URL without triggering scroll
+          window.history.pushState(null, null, `#${hash}`);
+        }
+      }
     }
   }
+});
+
+// Handle browser back/forward navigation
+window.addEventListener('popstate', () => {
+  const hash = window.location.hash;
+  handleHashNavigation(hash);
 });
