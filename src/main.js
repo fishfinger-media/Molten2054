@@ -474,72 +474,85 @@ function homepageJS(){
   }
 
 
-  if (document.querySelector('.swiper')) {
-    let swiper = null;
+  const mediaQuery = window.matchMedia('(min-width: 992px)');
 
-    function initSwiper() {
-      if (window.innerWidth > 991 && !swiper) {
-        swiper = new Swiper('.swiper', {
-          modules: [Navigation],
-          centeredSlides: true,
-          slidesPerView: 'auto',
-          allowTouchMove: false,
-          speed: 900,
-          spaceBetween: '0',
-          loop: true,
-          navigation: {
-            nextEl: '.swiper-nav.is-next',
-            prevEl: '.swiper-nav.is-prev',
-          },
-        });
-      } else if (window.innerWidth <= 991 && swiper) {
-        swiper.destroy(true, true); // true, true means remove all attached events and DOM elements
-        swiper = null;
+  // Initial check and listener for changes
+  function handleScreenChange(e) {
+      if (e.matches) {
+          if (document.querySelector('.swiper')) {
+              let swiper = null;
+          
+              function initSwiper() {
+                if (window.innerWidth > 991 && !swiper) {
+                  swiper = new Swiper('.swiper', {
+                    modules: [Navigation],
+                    centeredSlides: true,
+                    slidesPerView: 'auto',
+                    allowTouchMove: false,
+                    speed: 900,
+                    spaceBetween: '0',
+                    loop: true,
+                    navigation: {
+                      nextEl: '.swiper-nav.is-next',
+                      prevEl: '.swiper-nav.is-prev',
+                    },
+                  });
+                } else if (window.innerWidth <= 991 && swiper) {
+                  swiper.destroy(true, true); // true, true means remove all attached events and DOM elements
+                  swiper = null;
+                }
+              }
+              
+              // Initialize on page load
+              initSwiper();
+              
+              // Re-initialize on window resize
+              window.addEventListener('resize', () => {
+                initSwiper();
+              });
+          
+              gsap.set('.swiper-slide-active', { scale: 1 });
+          
+              const firstActiveSlide = document.querySelector('.swiper-slide-active');
+              const firstSlideBgImg = firstActiveSlide.querySelector('.background-img');
+              if (firstSlideBgImg) firstSlideBgImg.setAttribute('data-barba-img', '');
+          
+              swiper.on('slideChangeTransitionStart', () => {
+                gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
+                gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.8, ease: "power4.inOut" });
+          
+                const activeSlide = document.querySelector('.swiper-slide-active');
+                const companyName = activeSlide.getAttribute('data-company');
+                document.getElementById('company').textContent = companyName;
+          
+                document.querySelectorAll('.background-img').forEach(img => img.removeAttribute('data-barba-img'));
+          
+                const activeSlideBgImg = activeSlide.querySelector('.background-img');
+                if (activeSlideBgImg) activeSlideBgImg.setAttribute('data-barba-img', '');
+              });
+          
+              const swiperGsap = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.section_home-slider',
+                  start: 'top 70%',
+                  end: 'bottom 30%',
+                  markers: false,
+                  toggleActions: 'play reverse play reverse',
+                }
+              });
+          
+              swiperGsap.from('.swiper', { y: 150, scale: 0.8, opacity: 0, duration: 1, ease: "power4.inOut" });
+              swiperGsap.from('.swiper-slide-prev', { x: '40%', duration: 0.5 }, 0.4);
+              swiperGsap.from('.swiper-slide-next', { x: '-40%', duration: 0.5 }, 0.4);
+            }
       }
-    }
-    
-    // Initialize on page load
-    initSwiper();
-    
-    // Re-initialize on window resize
-    window.addEventListener('resize', () => {
-      initSwiper();
-    });
-
-    gsap.set('.swiper-slide-active', { scale: 1 });
-
-    const firstActiveSlide = document.querySelector('.swiper-slide-active');
-    const firstSlideBgImg = firstActiveSlide.querySelector('.background-img');
-    if (firstSlideBgImg) firstSlideBgImg.setAttribute('data-barba-img', '');
-
-    swiper.on('slideChangeTransitionStart', () => {
-      gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
-      gsap.to('.swiper-slide:not(.swiper-slide-active)', { scale: 0.7, duration: 0.8, ease: "power4.inOut" });
-
-      const activeSlide = document.querySelector('.swiper-slide-active');
-      const companyName = activeSlide.getAttribute('data-company');
-      document.getElementById('company').textContent = companyName;
-
-      document.querySelectorAll('.background-img').forEach(img => img.removeAttribute('data-barba-img'));
-
-      const activeSlideBgImg = activeSlide.querySelector('.background-img');
-      if (activeSlideBgImg) activeSlideBgImg.setAttribute('data-barba-img', '');
-    });
-
-    const swiperGsap = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.section_home-slider',
-        start: 'top 70%',
-        end: 'bottom 30%',
-        markers: false,
-        toggleActions: 'play reverse play reverse',
-      }
-    });
-
-    swiperGsap.from('.swiper', { y: 150, scale: 0.8, opacity: 0, duration: 1, ease: "power4.inOut" });
-    swiperGsap.from('.swiper-slide-prev', { x: '40%', duration: 0.5 }, 0.4);
-    swiperGsap.from('.swiper-slide-next', { x: '-40%', duration: 0.5 }, 0.4);
   }
+  
+  // Run on initial load
+  handleScreenChange(mediaQuery);
+  
+  // Add listener for changes
+  mediaQuery.addEventListener('change', handleScreenChange);
 
   if (document.querySelector('.section-home_finalcta')) {
 
