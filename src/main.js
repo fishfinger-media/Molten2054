@@ -346,14 +346,6 @@ function homepageJS(){
         }
         
         initSwiper();
-
-        function activeSlidecheck(){
-          const companyName = activeSlide?.getAttribute('data-company');
-          if (companyName) document.getElementById('company').textContent = companyName;
-          console.log("name updates", companyName)
-        }
-
-        activeSlidecheck()
         
         window.addEventListener('resize', initSwiper);
     
@@ -362,6 +354,14 @@ function homepageJS(){
         const firstActiveSlide = document.querySelector('.swiper-slide-active');
         const firstSlideBgImg = firstActiveSlide?.querySelector('.background-img');
         if (firstSlideBgImg) firstSlideBgImg.setAttribute('data-barba-img', '');
+
+        function activeSlidecheck(){
+          const companyName = activeSlide?.getAttribute('data-company');
+          if (companyName) document.getElementById('company').textContent = companyName;
+          console.log("name updates", companyName)
+        }
+
+        activeSlidecheck()
     
         swiper?.on('slideChangeTransitionStart', () => {
           gsap.to('.swiper-slide-active', { scale: 1, duration: 0.8, ease: "power4.inOut" });
