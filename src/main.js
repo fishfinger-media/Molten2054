@@ -160,17 +160,17 @@ function loader() {
   loader.to('.footer', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
   loader.to('.navigation', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
 
-  const originalContainer = document.querySelector('.hero-shapes_loader-container');
-  const newContainer = document.querySelector('.hero-shapes_final-container');
-  const img = document.querySelector('.shapes-wrapper');
-  const state = Flip.getState(img);
+  // const originalContainer = document.querySelector('.hero-shapes_loader-container');
+  // const newContainer = document.querySelector('.hero-shapes_final-container');
+  // const img = document.querySelector('.shapes-wrapper');
+  // const state = Flip.getState(img);
 
-    newContainer.appendChild(img);
-  Flip.from(state, {
-    duration: 1.5,
-    ease: "power1.inOut",
-    scale: false
-  });
+  //   newContainer.appendChild(img);
+  // Flip.from(state, {
+  //   duration: 1.5,
+  //   ease: "power1.inOut",
+  //   scale: false
+  // });
 
 }
 
