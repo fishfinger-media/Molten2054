@@ -126,7 +126,7 @@ document.querySelector('.nav-bar_link.is-music').addEventListener('click', funct
   toggleMusic()
 });
 
-function videoPLyr(){
+function videoPlyr(){
   const player = new Plyr('#player', {
 
     fullscreen: {
@@ -604,7 +604,7 @@ barba.init({
         loaderInit();
        
         navLogoFlip()
-        videoPLyr()
+        videoPlyr()
        
       
       },
@@ -628,7 +628,7 @@ barba.init({
     {
       namespace: 'film',
       afterEnter() {
-        videoPLyr()
+        videoPlyr()
       }
     }
   ]
