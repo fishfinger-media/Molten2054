@@ -533,6 +533,13 @@ barba.init({
   ],
   views: [
     {
+      namespace: 'portfolio',
+      beforeEnter() {
+        homepageJS();
+       
+      },
+    },
+    {
       namespace: 'home',
       beforeEnter() {
         // Initialize base functionality
