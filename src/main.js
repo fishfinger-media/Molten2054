@@ -409,8 +409,6 @@ function homepageJS(){
 
 }
 
-
-
 function navLogoFlip() {
   const originalNavContainer = document.querySelector('.logo-wrapper');
   const newNavContainer = document.querySelector('.nav-bar_logo-container');
