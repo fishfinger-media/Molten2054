@@ -513,7 +513,10 @@ barba.init({
             '.earth_footer',
             '[data-gsap="section-btn"]',
             '[gsap-heading]',
-            '.home-hero_content'
+            '.home-hero_content',
+            '.loader-text_wrapper',
+            '.loader-shadow',
+            '.home-hero_background'
           ], { clearProps: "all" });
           
           // Reinitialize homepage
@@ -547,19 +550,7 @@ barba.init({
   ]
 });
 
-// Add error handling
-barba.hooks.after(() => {
-  console.log('Transition completed');
-});
 
-barba.hooks.enter(() => {
-  console.log('Entering new page');
-});
-
-// Log any errors
-barba.hooks.error((err) => {
-  console.error('Barba.js error:', err);
-});
 
 // Update: Modified portfolio popup handler
 function portfolioPopup() {
