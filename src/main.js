@@ -18,7 +18,6 @@ let musicPlaying = false;
 document.getElementById('off-txt').style.opacity = '0.5';
 
 
-
 // NAVIGATION JS
 function navigationJS() {
   let navbarStatus = false;
@@ -160,17 +159,17 @@ function loader() {
   loader.to('.footer', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
   loader.to('.navigation', { opacity: 1, duration: 1, ease: "power4.inOut" }, 0);
 
-  // const originalContainer = document.querySelector('.hero-shapes_loader-container');
-  // const newContainer = document.querySelector('.hero-shapes_final-container');
-  // const img = document.querySelector('.shapes-wrapper');
-  // const state = Flip.getState(img);
+  const originalContainer = document.querySelector('.hero-shapes_loader-container');
+  const newContainer = document.querySelector('.hero-shapes_final-container');
+  const img = document.querySelector('.shapes-wrapper');
+  const state = Flip.getState(img);
 
-  //   newContainer.appendChild(img);
-  // Flip.from(state, {
-  //   duration: 1.5,
-  //   ease: "power1.inOut",
-  //   scale: false
-  // });
+    newContainer.appendChild(img);
+  Flip.from(state, {
+    duration: 1.5,
+    ease: "power1.inOut",
+    scale: false
+  });
 
 }
 
@@ -432,7 +431,27 @@ function homepageJS(){
 
 
 function navLogoFlip() {
-  console.log("flip was here")
+  const originalNavContainer = document.querySelector('.logo-wrapper');
+  const newNavContainer = document.querySelector('.nav-bar_logo-container');
+  const navLogo = document.querySelector('.logo.is-hero');
+  gsap.set('.logo.is-nav', {display: 'none'});
+  
+  const navState = Flip.getState(navLogo);
+  ScrollTrigger.create({
+    trigger: '[data-nav="trigger"]',
+    start: 'top 80%',
+    end: 'top 20%',
+    onEnter: () => {
+      newNavContainer.appendChild(navLogo);
+      Flip.from(navState, { duration: 0.8, scale: true });
+      
+    },
+    onLeaveBack: () => {
+      const reverseState = Flip.getState(navLogo);
+      originalNavContainer.appendChild(navLogo);
+      Flip.from(reverseState, { duration: 0.8, scale: true });
+    }
+  });
 }
 
 
@@ -443,50 +462,32 @@ document.querySelector('[data-gsap="enter"]').addEventListener('click', function
 
 // Update: Modified Barba.js initialization
 var websiteLoadedAlready = false;
+
+
 barba.init({
-  debug: true,
+  debug: true, // Enable debug mode to see what's happening
   preventRunning: true,
   transitions: [
     {
       name: 'opacity-transition',
       async leave(data) {
-        // Kill all ScrollTriggers and clean up
+        // Kill all ScrollTriggers before transition
         ScrollTrigger.getAll().forEach(st => st.kill());
         
-        // Store the scroll position
-        data.current.container.dataset.scrollPosition = window.scrollY;
-
-        const timeline = gsap.timeline();
-        await timeline.to(data.current.container, {
+        await gsap.to(data.current.container, {
           opacity: 0,
           duration: 0.5
         });
-
-        // Clean up any running animations
-        gsap.killTweensOf("*");
       },
       async enter(data) {
-        // Reset scroll position to top for new page
-        window.scrollTo(0, 0);
+      
+      
+      
         
-        // Ensure the new container is visible
-        data.next.container.style.visibility = 'visible';
-        
-        const timeline = gsap.timeline();
-        await timeline.from(data.next.container, {
+        await gsap.from(data.next.container, {
           opacity: 0,
           duration: 0.5
         });
-      },
-      async beforeEnter(data) {
-        // Clean up old content
-        if (data.current && data.current.container) {
-          data.current.container.remove();
-        }
-        
-        // Reset any global states
-        ScrollTrigger.clearScrollMemory();
-        ScrollTrigger.refresh(true);
       },
       after(data) {
         // Reinitialize everything
@@ -515,11 +516,8 @@ barba.init({
           // Reinitialize homepage
           restartWebflow();
           homepageJS();
-          
-          // Restart videos if any
-          document.querySelectorAll('.swiper video').forEach(video => {
-            if (video.paused) video.play();
-          });
+          document.querySelectorAll('.swiper video').forEach(video => video.play());
+
           
           // Update scroll systems
           lenis.resize();
@@ -539,34 +537,20 @@ barba.init({
         // Initialize base functionality
         homepageJS();
         loaderInit();
-        navLogoFlip();
+        navLogoFlip()
       },
       afterEnter() {
         ScrollTrigger.refresh(true);
-        // Ensure proper scroll position
-        window.scrollTo(0, 0);
       }
     },
     {
       namespace: 'portfolio',
-      beforeEnter() {
-        // Clean up any previous page states
-  
-      },
       afterEnter() {
         window.scrollTo(0, 0);
-        // Restart videos
-        document.querySelectorAll('video').forEach(video => {
-          if (video.paused) video.play();
-        });
-        // Refresh scroll triggers
-        ScrollTrigger.refresh(true);
+        document.querySelectorAll('video').forEach(video => video.play());
+
       }
     },
   ]
 });
-
-
-
-
 
