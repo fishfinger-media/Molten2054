@@ -664,12 +664,13 @@ document.body.addEventListener('htmx:beforeSwap', function(evt) {
   });
 
 
-navLogoFlip()
-homepageJS()
+
 
 
 
 if (document.body.hasAttribute('data-body-home')) {
   document.body.style.overflow = 'hidden';
   mainLenis.stop();
+  navLogoFlip()
+  homepageJS()  
 }
