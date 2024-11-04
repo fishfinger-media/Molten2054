@@ -551,6 +551,13 @@ barba.init({
 
       }
     },
+
+    {
+      namespace: 'about',
+      afterEnter() {
+        window.scrollTo(0, 0);
+      }
+    }
   ]
 });
 
