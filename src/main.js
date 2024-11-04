@@ -128,6 +128,13 @@ document.querySelector('.nav-bar_link.is-music').addEventListener('click', funct
 
 function videoPLyr(){
   const player = new Plyr('#player', {
+
+    fullscreen: {
+      enabled: true,
+      fallback: true,
+      iosNative: true // Enable native iOS fullscreen
+    },
+        
     controls: [
         'play-large',
         'play',
