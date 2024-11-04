@@ -673,8 +673,9 @@ window.addEventListener('load', () => {
 });
 
 
-
-document.querySelectorAll('[data-gsap="enter"]').addEventListener('click', function() {
-  loader();
-  websiteLoadedAlready =  true;
+document.querySelectorAll('[data-gsap="enter"]').forEach(element => {
+  element.addEventListener('click', function() {
+    loader();
+    websiteLoadedAlready = true;
+  });
 });
