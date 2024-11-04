@@ -475,23 +475,37 @@ function homepageJS(){
 
 
   if (document.querySelector('.swiper')) {
-    const swiper = new Swiper('.swiper', {
-      modules: [Navigation], 
+    let swiper = null;
 
-      
-      centeredSlides: true,
-      slidesPerView: 'auto',
-      allowTouchMove: false,
-      speed: 900,
-      spaceBetween: '0',
-      loop: true,
-      navigation: {
-        nextEl: '.swiper-nav.is-next',
-        prevEl: '.swiper-nav.is-prev',
-      },
+    function initSwiper() {
+      if (window.innerWidth > 991 && !swiper) {
+        swiper = new Swiper('.swiper', {
+          modules: [Navigation],
+          centeredSlides: true,
+          slidesPerView: 'auto',
+          allowTouchMove: false,
+          speed: 900,
+          spaceBetween: '0',
+          loop: true,
+          navigation: {
+            nextEl: '.swiper-nav.is-next',
+            prevEl: '.swiper-nav.is-prev',
+          },
+        });
+      } else if (window.innerWidth <= 991 && swiper) {
+        swiper.destroy(true, true); // true, true means remove all attached events and DOM elements
+        swiper = null;
+      }
+    }
+    
+    // Initialize on page load
+    initSwiper();
+    
+    // Re-initialize on window resize
+    window.addEventListener('resize', () => {
+      initSwiper();
     });
 
-    swiper.init();
     gsap.set('.swiper-slide-active', { scale: 1 });
 
     const firstActiveSlide = document.querySelector('.swiper-slide-active');
@@ -593,6 +607,8 @@ function homepageJS(){
 
 }
 
+
+
 function portfolioExit() {
  
   gsap.to('#portfolio-content', {opacity: 0, duration: 0.5, ease: "power4.inOut" });  
@@ -634,143 +650,13 @@ document.body.addEventListener('htmx:beforeSwap', function(evt) {
     });
   });
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 navLogoFlip()
 homepageJS()
 
 
+
+if (document.body.hasAttribute('data-body-home')) {
+  document.body.style.overflow = 'hidden';
+  mainLenis.stop();
+}
