@@ -510,7 +510,8 @@ barba.init({
             '.home-hero_content',
             '.loader-text_wrapper',
             '.loader-shadow',
-            '.home-hero_background'
+            '.home-hero_background',
+            '[data-footer-buttons]'
           ], { clearProps: "all" });
           
           // Reinitialize homepage
