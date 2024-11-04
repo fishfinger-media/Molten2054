@@ -18,6 +18,20 @@ setInterval(() => {
   console.log(bgMusicPlaying);
 }, 1000);
 
+gsap.from('.social-share_wrapper a', {
+  x: '6rem',
+  duration: 1,
+  ease: 'power4.inOut',
+  stagger: 0.1,
+  scrollTrigger: {
+    trigger: '[data-nav="trigger"]',
+    start: 'top 60%',
+    end: 'top 90%',
+    markers: false,
+    toggleActions: 'play none reverse none' 
+  }
+});
+
 const music = new Howl({
   src: ['https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3'],
   autoplay: false,
