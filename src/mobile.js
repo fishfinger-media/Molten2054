@@ -279,3 +279,37 @@ function navLogoFlip() {
 }
 
 navLogoFlip()
+
+
+// MUSIC
+const music = new Howl({
+  src: ['https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3'],
+  autoplay: false,
+  loop: true,
+  volume: 0 
+});
+
+function toggleMusic(){
+  if (musicPlaying === false) {
+    music.play();
+    setTimeout(() => {
+      music.fade(0, 1, 3000);
+    }, 200);
+    musicPlaying = true;
+    document.getElementById('off-txt').style.opacity = '0.5';
+    document.getElementById('on-txt').style.opacity = '1';
+
+  } else {
+    music.fade(1, 0, 3000);
+    setTimeout(() => {
+      music.pause();
+    }, 3000);
+    musicPlaying = false;
+    document.getElementById('off-txt').style.opacity = '1';
+    document.getElementById('on-txt').style.opacity = '0.5';
+  }
+};
+
+document.querySelector('.nav-bar_link.is-music').addEventListener('click', function() {
+  toggleMusic()
+});

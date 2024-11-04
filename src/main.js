@@ -11,6 +11,7 @@ import { cloneNode, restartWebflow } from '@finsweet/ts-utils';
 import {Howl, Howler} from 'howler';
 import Plyr from 'plyr';
 
+document.querySelectorAll('[data-mobile-only]').forEach(el => el.remove());
 
 
 gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
