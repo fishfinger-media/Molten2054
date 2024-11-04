@@ -462,10 +462,8 @@ document.querySelector('[data-gsap="enter"]').addEventListener('click', function
 
 // Update: Modified Barba.js initialization
 var websiteLoadedAlready = false;
-
-
 barba.init({
-  debug: true, // Enable debug mode to see what's happening
+  debug: true,
   preventRunning: true,
   transitions: [
     {
@@ -480,14 +478,25 @@ barba.init({
         });
       },
       async enter(data) {
-      
-      
-      
-        
         await gsap.from(data.next.container, {
           opacity: 0,
           duration: 0.5
         });
+
+        // Check for hash in URL after transition
+        const hash = window.location.hash;
+        if (hash) {
+          setTimeout(() => {
+            const targetElement = document.getElementById(hash.replace('#', ''));
+            if (targetElement) {
+              console.log('Scrolling to element:', targetElement);
+              lenis.scrollTo(targetElement, {
+                offset: 0,
+                duration: 1
+              });
+            }
+          }, 100);
+        }
       },
       after(data) {
         // Reinitialize everything
@@ -519,7 +528,6 @@ barba.init({
           homepageJS();
           document.querySelectorAll('.swiper video').forEach(video => video.play());
 
-          
           // Update scroll systems
           lenis.resize();
           ScrollTrigger.refresh(true);
@@ -536,7 +544,6 @@ barba.init({
       namespace: 'portfolio',
       beforeEnter() {
         homepageJS();
-       
       },
     },
     {
@@ -556,61 +563,58 @@ barba.init({
       afterEnter() {
         window.scrollTo(0, 0);
         document.querySelectorAll('video').forEach(video => video.play());
-
       }
     },
-
     {
       namespace: 'about',
       afterEnter() {
         window.scrollTo(0, 0);
       }
-    }, 
-
-    {
-      namespace: 'default',
-      beforeEnter({ next }) {
-        // Handle direct visits with hash in URL
-        const hash = window.location.hash;
-        if (hash) {
-          handleHashNavigation(hash, true);
-        }
-      }
-    },
+    }
   ]
 });
 
-
+// Handle anchor link clicks
 document.addEventListener('click', (e) => {
   const anchor = e.target.closest('a[href*="#"]');
   if (anchor) {
-    const href = anchor.getAttribute('href');
-    const isExternal = anchor.hostname !== window.location.hostname;
+    e.preventDefault();
     
-    if (!isExternal && href.includes('#')) {
-      e.preventDefault();
-      
-      const [path, hash] = href.split('#');
-      const currentPath = window.location.pathname;
-      
-      if (path && path !== currentPath) {
-        // If linking to different page with hash, update URL and let Barba handle it
-        window.location.href = href;
-      } else {
-        // If same-page anchor, scroll smoothly
-        const targetElement = document.getElementById(hash);
-        if (targetElement) {
-          scrollToElement(targetElement);
-          // Update URL without triggering scroll
-          window.history.pushState(null, null, `#${hash}`);
-        }
+    const href = anchor.getAttribute('href');
+    const [pathname, hash] = href.split('#');
+    
+    // If it's a same-page anchor
+    if (!pathname || pathname === window.location.pathname) {
+      const targetElement = document.getElementById(hash);
+      if (targetElement) {
+        console.log('Same page scroll to:', hash);
+        lenis.scrollTo(targetElement, {
+          offset: 0,
+          duration: 1
+        });
+        history.pushState(null, null, `#${hash}`);
       }
+    } else {
+      // If it's a different page, let Barba handle it
+      console.log('Navigate to new page with hash:', href);
+      window.location.href = href;
     }
   }
 });
 
-// Handle browser back/forward navigation
-window.addEventListener('popstate', () => {
+// Handle initial load with hash
+window.addEventListener('load', () => {
   const hash = window.location.hash;
-  handleHashNavigation(hash);
+  if (hash) {
+    setTimeout(() => {
+      const targetElement = document.getElementById(hash.replace('#', ''));
+      if (targetElement) {
+        console.log('Initial load scroll to:', hash);
+        lenis.scrollTo(targetElement, {
+          offset: 0,
+          duration: 1
+        });
+      }
+    }, 100);
+  }
 });
