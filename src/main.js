@@ -558,7 +558,42 @@ barba.init({
       afterEnter() {
         window.scrollTo(0, 0);
       }
+    }, 
+
+    {
+      namespace: 'default',
+    beforeEnter({ next }) {
+      // Handle direct visits with hash in URL
+      const hash = window.location.hash;
+      if (hash) {
+        const targetId = hash.replace('#', '');
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }
     }
   ]
 });
 
+
+document.addEventListener('click', (e) => {
+  const anchor = e.target.closest('a[href*="#"]');
+  if (anchor) {
+    const targetId = anchor.getAttribute('href').split('#')[1];
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      e.preventDefault();
+      window.scrollTo({
+        top: targetElement.offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  }
+});
