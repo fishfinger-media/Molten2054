@@ -9,6 +9,7 @@ import { Navigation } from 'swiper/modules';
 import SplitType from "split-type";
 import { cloneNode, restartWebflow } from '@finsweet/ts-utils';
 import {Howl, Howler} from 'howler';
+import Plyr from 'plyr';
 
 
 
@@ -124,6 +125,7 @@ function toggleMusic(){
 document.querySelector('.nav-bar_link.is-music').addEventListener('click', function() {
   toggleMusic()
 });
+
 
 
 function loaderInit(){
@@ -458,11 +460,13 @@ function navLogoFlip() {
 }
 
 
+if (document.querySelector('[data-gsap="enter]')){
+  document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
+    loader();
+    websiteLoadedAlready =  true;
+  });
+}
 
-document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
-  loader();
-  websiteLoadedAlready =  true;
-});
 
 // Update: Modified Barba.js initialization
 var websiteLoadedAlready = false;
@@ -624,3 +628,44 @@ window.addEventListener('load', () => {
   }
 });
 
+const player = new Plyr('#player', {
+  controls: [
+      'play-large',
+      'play',
+      'progress',
+      'current-time',
+      'duration',
+      'mute',
+      'volume',
+      'fullscreen'
+  ],
+  
+  resetOnEnd: true,
+  keyboard: { focused: true, global: true },
+  tooltips: { controls: true, seek: true },
+  quality: {
+      default: 1080,
+      options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
+  }
+});
+
+// Event listeners
+player.on('ready', () => {
+  console.log('Player is ready');
+});
+
+player.on('play', () => {
+  if (musicPlaying  === true) {
+    music.pause()
+  }
+});
+
+player.on('pause', () => {
+  if (musicPlaying  === true) {
+    music.play()
+  }
+});
+
+player.on('ended', () => {
+  console.log('Video ended');
+});
