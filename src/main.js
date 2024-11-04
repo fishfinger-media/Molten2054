@@ -76,6 +76,11 @@ function navigationJS() {
 }
 navigationJS()
 
+function activeSlidecheck(){
+  const companyName = activeSlide?.getAttribute('data-company');
+  if (companyName) document.getElementById('company').textContent = companyName;
+}
+
 // LENIS
 const lenis = new Lenis();
 
@@ -455,6 +460,7 @@ function navLogoFlip() {
 }
 
 
+
 document.querySelector('[data-gsap="enter"]').addEventListener('click', function() {
   loader();
   websiteLoadedAlready =  true;
@@ -552,6 +558,7 @@ barba.init({
         // Initialize base functionality
         homepageJS();
         loaderInit();
+        activeSlidecheck()
         navLogoFlip()
       },
       afterEnter() {
@@ -618,3 +625,4 @@ window.addEventListener('load', () => {
     }, 100);
   }
 });
+
