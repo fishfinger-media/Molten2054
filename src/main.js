@@ -134,7 +134,7 @@ function videoPLyr(){
       fallback: true,
       iosNative: true // Enable native iOS fullscreen
     },
-
+        
     controls: [
         'play-large',
         'play',
@@ -510,221 +510,173 @@ function navLogoFlip() {
 
 
 
-// Initialize variables
-let barbaInstance = null;
-let websiteLoadedAlready = false;
+// Update: Modified Barba.js initialization
+var websiteLoadedAlready = false;
+barba.init({
+  debug: true,
+  preventRunning: true,
+  transitions: [
+    {
+      name: 'opacity-transition',
+      async leave(data) {
+        // Kill all ScrollTriggers before transition
+        ScrollTrigger.getAll().forEach(st => st.kill());
+        
+        await gsap.to(data.current.container, {
+          opacity: 0,
+          duration: 0.5
+        });
+      },
+      async enter(data) {
+        await gsap.from(data.next.container, {
+          opacity: 0,
+          duration: 0.5
+        });
 
-// Function to initialize Barba
-function initBarba() {
-  barbaInstance = barba.init({
-    debug: true,
-    preventRunning: true,
-    transitions: [
-      {
-        name: 'opacity-transition',
-        async leave(data) {
-          // Kill all ScrollTriggers before transition
-          ScrollTrigger.getAll().forEach(st => st.kill());
-          
-          await gsap.to(data.current.container, {
-            opacity: 0,
-            duration: 0.5
-          });
-        },
-        async enter(data) {
-          await gsap.from(data.next.container, {
-            opacity: 0,
-            duration: 0.5
-          });
-
-          // Check for hash in URL after transition
-          const hash = window.location.hash;
-          if (hash) {
-            setTimeout(() => {
-              const targetElement = document.getElementById(hash.replace('#', ''));
-              if (targetElement) {
-                console.log('Scrolling to element:', targetElement);
-                lenis.scrollTo(targetElement, {
-                  offset: 0,
-                  duration: 1
-                });
-              }
-            }, 100);
-          }
-        },
-        after(data) {
-          // Reinitialize everything
-          if (data.next.namespace === 'home') {
-            // Clear any existing animations
-            gsap.killTweensOf("*");
-            
-            // Reset all GSAP-modified elements
-            gsap.set([
-              '.lines',
-              '.section-home_intro h2',
-              '.portfolio-grid_wrapper',
-              '.swiper',
-              '.swiper-slide',
-              '.section-home_finalcta h2',
-              '.text-color_coral',
-              '.earth_footer',
-              '[data-gsap="section-btn"]',
-              '[gsap-heading]',
-              '.home-hero_content',
-              '.loader-text_wrapper',
-              '.loader-shadow',
-              '.home-hero_background',
-              '[data-footer-buttons]'
-            ], { clearProps: "all" });
-            
-            // Reinitialize homepage
-            restartWebflow();
-            homepageJS();
-            document.querySelectorAll('.swiper video').forEach(video => video.play());
-
-            // Update scroll systems
-            lenis.resize();
-            ScrollTrigger.refresh(true);
-            
-            if (websiteLoadedAlready) {
-              loader();
+        // Check for hash in URL after transition
+        const hash = window.location.hash;
+        if (hash) {
+          setTimeout(() => {
+            const targetElement = document.getElementById(hash.replace('#', ''));
+            if (targetElement) {
+              console.log('Scrolling to element:', targetElement);
+              lenis.scrollTo(targetElement, {
+                offset: 0,
+                duration: 1
+              });
             }
+          }, 100);
+        }
+      },
+      after(data) {
+        // Reinitialize everything
+        if (data.next.namespace === 'home') {
+          // Clear any existing animations
+          gsap.killTweensOf("*");
+          
+          // Reset all GSAP-modified elements
+          gsap.set([
+            '.lines',
+            '.section-home_intro h2',
+            '.portfolio-grid_wrapper',
+            '.swiper',
+            '.swiper-slide',
+            '.section-home_finalcta h2',
+            '.text-color_coral',
+            '.earth_footer',
+            '[data-gsap="section-btn"]',
+            '[gsap-heading]',
+            '.home-hero_content',
+            '.loader-text_wrapper',
+            '.loader-shadow',
+            '.home-hero_background',
+            '[data-footer-buttons]'
+          ], { clearProps: "all" });
+          
+          // Reinitialize homepage
+          restartWebflow();
+          homepageJS();
+          document.querySelectorAll('.swiper video').forEach(video => video.play());
+
+          // Update scroll systems
+          lenis.resize();
+          ScrollTrigger.refresh(true);
+          
+          if (websiteLoadedAlready) {
+            loader();
           }
         }
       }
-    ],
-    views: [
-      {
-        namespace: 'portfolio',
-        beforeEnter() {
-          homepageJS();
-        },
+    }
+  ],
+  views: [
+    {
+      namespace: 'portfolio',
+      beforeEnter() {
+        homepageJS();
       },
-      {
-        namespace: 'home',
-        beforeEnter() {
-          // Initialize base functionality
-          homepageJS();
-          loaderInit();
-          navLogoFlip();
-          videoPLyr();
-        },
-        afterEnter() {
-          ScrollTrigger.refresh(true);
-        }
+    },
+    {
+      namespace: 'home',
+      beforeEnter() {
+        // Initialize base functionality
+        homepageJS();
+        loaderInit();
+       
+        navLogoFlip()
+        videoPLyr()
+       
+      
       },
-      {
-        namespace: 'portfolio',
-        afterEnter() {
-          window.scrollTo(0, 0);
-          document.querySelectorAll('video').forEach(video => video.play());
-        }
-      },
-      {
-        namespace: 'about',
-        afterEnter() {
-          window.scrollTo(0, 0);
-        }
-      }, 
-      {
-        namespace: 'film',
-        afterEnter() {
-          videoPLyr();
-        }
+      afterEnter() {
+        ScrollTrigger.refresh(true);
       }
-    ]
-  });
-}
+    },
+    {
+      namespace: 'portfolio',
+      afterEnter() {
+        window.scrollTo(0, 0);
+        document.querySelectorAll('video').forEach(video => video.play());
+      }
+    },
+    {
+      namespace: 'about',
+      afterEnter() {
+        window.scrollTo(0, 0);
+      }
+    }, 
+    {
+      namespace: 'film',
+      afterEnter() {
+        videoPLyr()
+      }
+    }
+  ]
+});
 
-// Function to destroy Barba
-function destroyBarba() {
-  if (barbaInstance) {
-    barbaInstance.destroy();
-    barbaInstance = null;
-  }
-}
-
-// Function to handle responsive Barba initialization
-function handleResponsiveBarba() {
-  const mediaQuery = window.matchMedia('(min-width: 992px)');
-  
-  function handleScreenChange(e) {
-    if (e.matches) {
-      // Desktop: Initialize Barba if not already initialized
-      if (!barbaInstance) {
-        initBarba();
-        initAnchorHandling();
+// Handle anchor link clicks
+document.addEventListener('click', (e) => {
+  const anchor = e.target.closest('a[href*="#"]');
+  if (anchor) {
+    e.preventDefault();
+    
+    const href = anchor.getAttribute('href');
+    const [pathname, hash] = href.split('#');
+    
+    // If it's a same-page anchor
+    if (!pathname || pathname === window.location.pathname) {
+      const targetElement = document.getElementById(hash);
+      if (targetElement) {
+        console.log('Same page scroll to:', hash);
+        lenis.scrollTo(targetElement, {
+          offset: 0,
+          duration: 1
+        });
+        history.pushState(null, null, `#${hash}`);
       }
     } else {
-      // Mobile: Destroy Barba if initialized
-      destroyBarba();
+      // If it's a different page, let Barba handle it
+      console.log('Navigate to new page with hash:', href);
+      window.location.href = href;
     }
   }
+});
 
-  // Initial check
-  handleScreenChange(mediaQuery);
-  
-  // Listen for changes
-  mediaQuery.addEventListener('change', handleScreenChange);
-}
-
-// Function to initialize anchor handling
-function initAnchorHandling() {
-  // Handle anchor link clicks
-  document.addEventListener('click', (e) => {
-    const anchor = e.target.closest('a[href*="#"]');
-    if (anchor) {
-      e.preventDefault();
-      
-      const href = anchor.getAttribute('href');
-      const [pathname, hash] = href.split('#');
-      
-      // If it's a same-page anchor
-      if (!pathname || pathname === window.location.pathname) {
-        const targetElement = document.getElementById(hash);
-        if (targetElement) {
-          console.log('Same page scroll to:', hash);
-          lenis.scrollTo(targetElement, {
-            offset: 0,
-            duration: 1
-          });
-          history.pushState(null, null, `#${hash}`);
-        }
-      } else {
-        // If it's a different page, let Barba handle it
-        console.log('Navigate to new page with hash:', href);
-        window.location.href = href;
+// Handle initial load with hash
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (hash) {
+    setTimeout(() => {
+      const targetElement = document.getElementById(hash.replace('#', ''));
+      if (targetElement) {
+        console.log('Initial load scroll to:', hash);
+        lenis.scrollTo(targetElement, {
+          offset: 0,
+          duration: 1
+        });
       }
-    }
-  });
-
-  // Handle initial load with hash
-  window.addEventListener('load', () => {
-    const hash = window.location.hash;
-    if (hash) {
-      setTimeout(() => {
-        const targetElement = document.getElementById(hash.replace('#', ''));
-        if (targetElement) {
-          console.log('Initial load scroll to:', hash);
-          lenis.scrollTo(targetElement, {
-            offset: 0,
-            duration: 1
-          });
-        }
-      }, 100);
-    }
-  });
-}
-
-// Initialize the responsive handling
-handleResponsiveBarba();
-
-// Handle enter button clicks
-document.querySelectorAll('[data-gsap="enter"]').forEach(element => {
-  element.addEventListener('click', function() {
-    loader();
-    websiteLoadedAlready = true;
-  });
+    }, 100);
+  }
 });
 
 
