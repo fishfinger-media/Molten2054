@@ -176,7 +176,7 @@ function homepageJS(){
       scrollTrigger: {
         trigger: '.section-home_hero',
         start: 'bottom 95%',
-        end: 'bottom 10%',
+        end: 'bottom 20%',
         scrub: true,
         markers: false,
       }
