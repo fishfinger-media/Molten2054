@@ -208,6 +208,12 @@ function navigationJS() {
   function navStatus() {
     if (!navbarStatus) {
       gsap.set('.nav-menu_wrapper', { opacity: 0 });
+
+      gsap.set('.nav-menu_wrapper', { display: 'none' });
+      gsap.set('[data-gsap="nav"]', { clearProps: "all" });
+      gsap.set('.nav-menu_divider', { clearProps: "all" });
+      gsap.set('.nav-menu_shape-wrapper', { clearProps: "all" });
+      
       const navOpen = gsap.timeline();
       navOpen.to('#Bottom', { y:'-20', duration:0.5 }, 0);
       navOpen.to('#Top', { y:'20', duration:0.5 }, 0);

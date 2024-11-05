@@ -146,6 +146,7 @@ function videoPlyr(){
     ],
     
     resetOnEnd: true,
+    hideControls: false,
     keyboard: { focused: true, global: true },
     tooltips: { controls: true, seek: true },
     quality: {
@@ -321,6 +322,19 @@ function homepageJS(){
       duration: 1,
       ease: "sine.inOut",
     }, 0);
+  }
+
+  if (document.querySelector('.section-home_video')){
+    const videoSection = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.section-home_video',
+        start: 'top 50%',
+        toggleActions: 'play none none reset',
+        onRefresh: self => self.scroll(self.scroll())
+      }
+    });
+
+    videoSection.from('.home-video_wrapper', {opacity: 0, y: 50, duration: 1, ease: "power4.inOut" });
   }
 
   if (document.querySelector('.portfolio-grid_wrapper')) {
