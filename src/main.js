@@ -78,8 +78,6 @@ function navigationJS() {
 }
 navigationJS()
 
-
-
 // LENIS
 const lenis = new Lenis();
 

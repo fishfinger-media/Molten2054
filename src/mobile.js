@@ -1,31 +1,37 @@
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from 'lenis';
-import { Navigation } from 'swiper/modules';
 import SplitType from "split-type";
-import {Howl, Howler} from 'howler';
 import Plyr from 'plyr';
 
-// Initialize Lenis
-const lenis = new Lenis();
-// Use requestAnimationFrame to continuously update the scroll
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-}
-requestAnimationFrame(raf);
 
-gsap.registerPlugin(Flip, ScrollTrigger, CustomEase);
+gsap.registerPlugin(Flip, ScrollTrigger);
+
+
+
+const music = new Audio('https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3');
+
+// Toggle audio between play and pause
+function toggleMusic() {
+    if (music.paused) {
+        music.play();
+    } else {
+        music.pause();
+    }
+}
+
+document.querySelector('.nav-bar_link.is-music').addEventListener('click', function() {
+  toggleMusic()
+});
+
 
 const paragraph = new SplitType('[gsap-heading]', { types: 'words, chars' });
 
 const introSection = gsap.timeline({
   scrollTrigger: {
     trigger: '.section-home_intro',
-    start: 'top 20%',
+    start: 'top 50%',
     toggleActions: 'play none none reset',
-    onRefresh: self => self.scroll(self.scroll())
   }
 });
 
@@ -126,10 +132,10 @@ if (document.querySelector('.portfolio-grid_wrapper')) {
     opacity: 0, 
     scale: 1.2, 
     duration: 1.5,
-    ease: CustomEase.create("custom", "M0,0 C0,0.05 0.25,1 1,1 "),
+    ease: "power4.inOut",
     scrollTrigger: {
       trigger: '.portfolio-grid_wrapper',
-      start: 'top 60%',
+      start: 'top 80%',
       end: 'bottom 40%',
       toggleActions: 'play reverse play reverse',
       onRefresh: self => self.scroll(self.scroll())
@@ -281,35 +287,6 @@ function navLogoFlip() {
 navLogoFlip()
 
 
-// MUSIC
-const music = new Howl({
-  src: ['https://cdn.jsdelivr.net/gh/fishfinger-media/Molten2054/src/future.mp3'],
-  autoplay: false,
-  loop: true,
-  volume: 0 
-});
+console.log("mobile loaded")
 
-function toggleMusic(){
-  if (musicPlaying === false) {
-    music.play();
-    setTimeout(() => {
-      music.fade(0, 1, 3000);
-    }, 200);
-    musicPlaying = true;
-    document.getElementById('off-txt').style.opacity = '0.5';
-    document.getElementById('on-txt').style.opacity = '1';
-
-  } else {
-    music.fade(1, 0, 3000);
-    setTimeout(() => {
-      music.pause();
-    }, 3000);
-    musicPlaying = false;
-    document.getElementById('off-txt').style.opacity = '1';
-    document.getElementById('on-txt').style.opacity = '0.5';
-  }
-};
-
-document.querySelector('.nav-bar_link.is-music').addEventListener('click', function() {
-  toggleMusic()
-});
+document.querySelectorAll('.home_hero_loader').forEach(el => el.remove());
