@@ -708,3 +708,5 @@ document.querySelectorAll('[data-gsap="enter"]').forEach(element => {
     websiteLoadedAlready = true;
   });
 });
+
+videoPlyr()
