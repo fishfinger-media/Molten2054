@@ -162,12 +162,18 @@ function videoPlyr(){
   player.on('play', () => {
     if (musicPlaying  === true) {
       music.pause()
+      gsap.to('.page-wrapper', { backgroundColor: 'rgba(0, 0, 0, 1)', duration: 0.5, ease: "power4.inOut" });
+      gsap.to('.navigation', { opacity: 0, duration: 0.5, ease: "power4.inOut" });
+      gsap.to('.footer', { opacity: 0, duration: 0.5, ease: "power4.inOut" });
     }
   });
   
   player.on('pause', () => {
     if (musicPlaying  === true) {
       music.play()
+      gsap.to('.page-wrapper', { backgroundColor: 'rgba(0, 0, 0, 0)', duration: 0.5, ease: "power4.inOut" });
+      gsap.to('.navigation', { opacity: 1, duration: 0.5, ease: "power4.inOut" });
+      gsap.to('.footer', { opacity: 1, duration: 0.5, ease: "power4.inOut" });
     }
   });
   
