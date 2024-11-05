@@ -627,6 +627,7 @@ barba.init({
     {
       namespace: 'film',
       afterEnter() {
+        window.scrollTo(0, 0);
         videoPlyr()
       }
     }
