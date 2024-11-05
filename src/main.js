@@ -589,7 +589,8 @@ barba.init({
             '.loader-text_wrapper',
             '.loader-shadow',
             '.home-hero_background',
-            '[data-footer-buttons]'
+            '[data-footer-buttons]',
+            '.section-home_video',
           ], { clearProps: "all" });
           
           // Reinitialize homepage
