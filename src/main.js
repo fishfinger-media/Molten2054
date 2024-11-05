@@ -613,7 +613,8 @@ barba.init({
     {
       namespace: 'portfolio',
       beforeEnter() {
-        homepageJS();
+        
+        videoPlyr()
       },
     },
     {
