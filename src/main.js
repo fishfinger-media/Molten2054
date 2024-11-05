@@ -329,12 +329,12 @@ function homepageJS(){
       scrollTrigger: {
         trigger: '.section-home_video',
         start: 'top 50%',
-        toggleActions: 'play none none reset',
+        toggleActions: 'play reverse play reverse',
         onRefresh: self => self.scroll(self.scroll())
       }
     });
 
-    videoSection.from('.home-video_wrapper', {opacity: 0, y: 50, duration: 1, ease: "power4.inOut" });
+    videoSection.from('.home-video_wrapper', {opacity: 0, scale: 0.8, duration: 1, ease: "power4.inOut" });
   }
 
   if (document.querySelector('.portfolio-grid_wrapper')) {
