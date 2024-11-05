@@ -614,7 +614,7 @@ barba.init({
       namespace: 'portfolio',
       beforeEnter() {
         
-        videoPlyr()
+        
       },
     },
     {
@@ -638,6 +638,7 @@ barba.init({
       afterEnter() {
         window.scrollTo(0, 0);
         document.querySelectorAll('video').forEach(video => video.play());
+        videoPlyr()
       }
     },
     {
